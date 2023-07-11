@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+apply from:'../shared_dependencies.gradle'
+
 android {
     namespace 'com.muhammhassan.epatrol'
     compileSdk 33
@@ -18,9 +20,16 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        buildFeatures{
+            buildConfig true
+        }
     }
 
     buildTypes {
+        debug {
+
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -47,6 +56,7 @@ android {
 }
 
 dependencies {
+    implementation project(':domain')
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')

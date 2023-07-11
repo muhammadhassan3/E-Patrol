@@ -1,0 +1,11 @@
+dependencies {
+    //koin
+    implementation "io.insert-koin:koin-core:3.4.0"
+    implementation "io.insert-koin:koin-android:3.4.0"
+
+    //Timber
+    implementation "com.jakewharton.timber:timber:5.0.1"
+
+    //canary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.11'
+}
