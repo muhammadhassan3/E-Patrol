@@ -1,4 +1,4 @@
-package com.muhammhassan.epatrol
+package com.muhammhassan.epatrol.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,10 +10,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition{
+            runBlocking {
+                delay(2000)
+            }
+            false
+        }
+
         super.onCreate(savedInstanceState)
         setContent {
             EPatrolTheme {
