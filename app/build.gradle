@@ -61,6 +61,8 @@ dependencies {
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material:1.4.3'
+    implementation 'androidx.navigation:navigation-compose:2.6.0'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
     implementation 'br.com.devsrsouza.compose.icons:octicons:1.1.0'
@@ -75,4 +77,11 @@ dependencies {
 
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    //koin compose
+    implementation 'io.insert-koin:koin-androidx-compose:3.4.5'
+
+    //glide
+    implementation "com.github.bumptech.glide:compose:1.0.0-alpha.1"
+
 }
