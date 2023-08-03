@@ -19,11 +19,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://localhost/"'
+            buildConfigField "String", "BASE_URL", '"https://epatrol.protic.web.id/api/"'
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", '"https://epatrol.protic.web.id/api/"'
         }
     }
     compileOptions {
