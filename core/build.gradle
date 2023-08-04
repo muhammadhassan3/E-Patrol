@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id('com.google.devtools.ksp')
 }
 apply from:'../shared_dependencies.gradle'
 android {
@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://epatrol.protic.web.id/api/"'
+            buildConfigField "String", "BASE_URL", '"http://10.0.2.2"'
         }
         release {
             minifyEnabled false
@@ -28,14 +28,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures{
         buildConfig true
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 }
 
@@ -43,7 +43,7 @@ dependencies {
     //room
     implementation "androidx.room:room-runtime:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"
-    kapt "androidx.room:room-compiler:2.5.2"
+    ksp "androidx.room:room-compiler:2.5.2"
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
