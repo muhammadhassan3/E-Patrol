@@ -3,6 +3,7 @@ package com.muhammhassan.epatrol.presentation.home
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -10,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,14 +28,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.muhammhassan.epatrol.component.DialogContent
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardView
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListView
 import com.muhammhassan.epatrol.presentation.home.task.TaskListViewModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Tertiary
-import com.muhammhassan.epatrol.utils.DialogData
 import com.muhammhassan.epatrol.utils.NavigationItem
 import com.muhammhassan.epatrol.utils.Screen
 import compose.icons.Octicons
@@ -49,7 +49,7 @@ fun HomeView(
 ) {
 
     val isDialogShow = remember { mutableStateOf(false) }
-    val dialogData = remember { mutableStateOf(DialogData.init()) }
+    val dialogData = remember { mutableStateOf("") }
 
     val navigation = listOf(
         NavigationItem("Beranda", Octicons.Home24, screen = Screen.Dashboard),
@@ -58,14 +58,15 @@ fun HomeView(
     )
 
     if (isDialogShow.value) {
-        Dialog(onDismissRequest = { isDialogShow.value = false }) {
-            DialogContent(
-                message = dialogData.value.message,
-                title = dialogData.value.title,
-                buttonType = dialogData.value.buttonType,
-                action = dialogData.value.action
-            )
-        }
+        AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
+            TextButton(onClick = { isDialogShow.value = false }) {
+                Text(text = "Oke")
+            }
+        }, title = {
+            Text(text = "Pemberitahuan")
+        }, text = {
+            Text(text = dialogData.value)
+        })
     }
     Scaffold(modifier = modifier, bottomBar = {
         val currentStack by navController.currentBackStackEntryAsState()
@@ -110,13 +111,13 @@ fun HomeView(
                     onNotificationClicked = { /*TODO*/ },
                     onItemClicked = {},
                     onRefreshTriggered = viewModel::getTask,
-                    setIsDialogShow = {
-                        isDialogShow.value = it
-                    },
+                    modifier = Modifier.fillMaxSize(),
                     setDialogData = {
                         dialogData.value = it
                     },
-                    modifier = Modifier.fillMaxSize()
+                    setIsDialogShow = {
+                        isDialogShow.value = it
+                    }
                 )
             }
             

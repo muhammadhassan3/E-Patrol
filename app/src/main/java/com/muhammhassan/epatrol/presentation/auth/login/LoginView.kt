@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -13,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,15 +37,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.muhammhassan.epatrol.R
-import com.muhammhassan.epatrol.component.DialogContent
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
 import com.muhammhassan.epatrol.ui.theme.Secondary
-import com.muhammhassan.epatrol.utils.ButtonType
-import com.muhammhassan.epatrol.utils.DialogActions
-import com.muhammhassan.epatrol.utils.DialogData
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
@@ -65,7 +63,7 @@ fun LoginView(
         mutableStateOf(false)
     }
     val dialogData = remember {
-        mutableStateOf(DialogData.init())
+        mutableStateOf("")
     }
     val isDialogShow = remember {
         mutableStateOf(false)
@@ -75,23 +73,7 @@ fun LoginView(
         when (state) {
             is UiState.Error -> {
                 isLoading.value = false
-                dialogData.value = DialogData("Pemberitahuan",
-                    state.message,
-                    ButtonType.NEUTRAL,
-                    action = object : DialogActions {
-                        override fun onConfirmAction() {
-
-                        }
-
-                        override fun onCancelAction() {
-
-                        }
-
-                        override fun onNeutralAction() {
-                            isDialogShow.value = false
-                        }
-
-                    })
+                dialogData.value = state.message
                 isDialogShow.value = true
             }
 
@@ -109,14 +91,15 @@ fun LoginView(
     })
 
     if (isDialogShow.value) {
-        Dialog(onDismissRequest = { isDialogShow.value = false }) {
-            DialogContent(
-                message = dialogData.value.message,
-                title = dialogData.value.title,
-                buttonType = dialogData.value.buttonType,
-                action = dialogData.value.action
-            )
-        }
+        AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
+            TextButton(onClick = { isDialogShow.value = false }) {
+                Text(text = "Oke")
+            }
+        }, title = {
+            Text(text = "Pemberitahuan")
+        }, text = {
+            Text(text = dialogData.value)
+        })
     }
 
     ConstraintLayout(modifier = modifier.fillMaxSize()) {

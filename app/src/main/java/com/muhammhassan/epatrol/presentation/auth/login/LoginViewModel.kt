@@ -50,7 +50,6 @@ class LoginViewModel(private val useCase: LoginUseCase): ViewModel() {
             useCase.login(email.value, password.value).collect{
                 _state.value = it
             }
-
         }
     }
 }

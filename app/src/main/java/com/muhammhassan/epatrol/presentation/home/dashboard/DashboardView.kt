@@ -42,9 +42,6 @@ import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
-import com.muhammhassan.epatrol.utils.ButtonType
-import com.muhammhassan.epatrol.utils.DialogActions
-import com.muhammhassan.epatrol.utils.DialogData
 import compose.icons.Octicons
 import compose.icons.octicons.Bell24
 import compose.icons.octicons.Person24
@@ -58,7 +55,7 @@ fun DashboardView(
     onNotificationClicked: () -> Unit,
     onItemClicked: (patrolId: Long) -> Unit,
     onRefreshTriggered: () -> Unit,
-    setDialogData: (value: DialogData) -> Unit,
+    setDialogData: (value: String) -> Unit,
     setIsDialogShow: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -80,23 +77,7 @@ fun DashboardView(
             is UiState.Error -> {
                 isLoading.value = false
                 setDialogData.invoke(
-                    DialogData(title = "Pemberitahuan",
-                        message = uiState.message,
-                        buttonType = ButtonType.NEUTRAL,
-                        action = object : DialogActions {
-                            override fun onConfirmAction() {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onCancelAction() {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onNeutralAction() {
-                                setIsDialogShow.invoke(false)
-                            }
-
-                        })
+                    uiState.message
                 )
                 setIsDialogShow.invoke(true)
             }

@@ -31,16 +31,13 @@ import androidx.constraintlayout.compose.Dimension
 import com.muhammhassan.epatrol.component.PatrolItem
 import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.domain.model.UiState
-import com.muhammhassan.epatrol.utils.ButtonType
-import com.muhammhassan.epatrol.utils.DialogActions
-import com.muhammhassan.epatrol.utils.DialogData
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TaskListView(
     uiState: UiState<List<PatrolModel>>,
     onRefreshTriggered: () -> Unit,
-    setDialogData: (value: DialogData) -> Unit,
+    setDialogData: (value: String) -> Unit,
     setIsDialogShow: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -56,23 +53,7 @@ fun TaskListView(
             is UiState.Error -> {
                 isLoading.value = false
                 setDialogData.invoke(
-                    DialogData(title = "Pemberitahuan",
-                        message = uiState.message,
-                        buttonType = ButtonType.NEUTRAL,
-                        action = object : DialogActions {
-                            override fun onConfirmAction() {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onCancelAction() {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onNeutralAction() {
-                                setIsDialogShow.invoke(false)
-                            }
-
-                        })
+                    uiState.message
                 )
                 setIsDialogShow.invoke(true)
             }
