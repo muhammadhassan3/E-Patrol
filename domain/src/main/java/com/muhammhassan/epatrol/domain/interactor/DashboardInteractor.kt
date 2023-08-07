@@ -30,10 +30,17 @@ class DashboardInteractor(private val user: UserRepository, private val task: Ta
                         hour = it.jam,
                         lead = it.ketua,
                         verified = it.verified,
-                        address = it.alamat
+                        address = it.alamat,
+                        plate =  it.plate
                     )
                 }
             }
+        }
+    }
+
+    override suspend fun verifyPatrolTask(id: Long): Flow<UiState<Nothing>> {
+        return task.verifyPatrolTas(id).map {
+            it.mapToUiState { body -> body }
         }
     }
 }

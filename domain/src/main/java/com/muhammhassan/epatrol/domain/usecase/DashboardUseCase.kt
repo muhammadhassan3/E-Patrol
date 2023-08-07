@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface DashboardUseCase {
     fun getUser(): Flow<UserModel>
     suspend fun getTaskList(): Flow<UiState<List<PatrolModel>>>
+    suspend fun verifyPatrolTask(id: Long): Flow<UiState<Nothing>>
 }
