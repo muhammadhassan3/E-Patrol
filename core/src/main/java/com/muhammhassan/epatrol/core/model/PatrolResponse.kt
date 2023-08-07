@@ -9,4 +9,5 @@ data class PatrolResponse(
     val verified: Boolean,
     val judul: String,
     val id: Long,
+    val plate: String
 )
