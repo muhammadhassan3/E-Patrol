@@ -8,5 +8,6 @@ data class PatrolModel(
     val hour: String,
     val lead: String,
     val verified: Boolean,
-    val address: String
+    val address: String,
+    val plate: String,
 )
