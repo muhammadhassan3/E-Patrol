@@ -2,6 +2,7 @@ package com.muhammhassan.epatrol.core.datasource.remote.api
 
 import com.muhammhassan.epatrol.core.model.BaseResponse
 import com.muhammhassan.epatrol.core.model.LoginResponse
+import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolResponse
 import retrofit2.Response
 import retrofit2.http.Field
@@ -24,4 +25,7 @@ interface ApiInterface {
 
     @PUT("patrol/{id}/verify")
     suspend fun verifyPatrol(@Path("id") id: Long): Response<BaseResponse<Nothing>>
+
+    @GET("patrol/{id}")
+    suspend fun getDetail(@Path("id")id: Long): Response<BaseResponse<PatrolDetailResponse>>
 }
