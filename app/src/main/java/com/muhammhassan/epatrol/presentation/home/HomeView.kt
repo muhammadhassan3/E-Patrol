@@ -3,25 +3,25 @@ package com.muhammhassan.epatrol.presentation.home
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -47,50 +47,45 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeView(
     modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()
 ) {
-
-    val isDialogShow = remember { mutableStateOf(false) }
-    val dialogData = remember { mutableStateOf("") }
-
     val navigation = listOf(
         NavigationItem("Beranda", Octicons.Home24, screen = Screen.Dashboard),
         NavigationItem("Tugas Patroli", Octicons.Note24, screen = Screen.Task),
         NavigationItem("Profil", Octicons.Person24, screen = Screen.Profile)
     )
 
-    if (isDialogShow.value) {
-        AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
-            TextButton(onClick = { isDialogShow.value = false }) {
-                Text(text = "Oke")
-            }
-        }, title = {
-            Text(text = "Pemberitahuan")
-        }, text = {
-            Text(text = dialogData.value)
-        })
-    }
+    val backStack = navController.currentBackStackEntryAsState()
+    val route = backStack.value?.destination?.route
     Scaffold(modifier = modifier, bottomBar = {
         val currentStack by navController.currentBackStackEntryAsState()
         val currentRoute = currentStack?.destination?.route
         BottomAppBar(modifier = Modifier, containerColor = Color.White) {
             navigation.map { item ->
-                NavigationBarItem(selected = currentRoute == item.screen.route,
-                    onClick = {
-                        navController.navigate(item.screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            restoreState = true
-                            launchSingleTop = true
+                NavigationBarItem(selected = currentRoute == item.screen.route, onClick = {
+                    navController.navigate(item.screen.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
-                    },
-                    icon = {
-                        Icon(imageVector = item.icon, contentDescription = "${item.title} page")
-                    },
-                    label = {
-                        Text(text = item.title)
-                    },
-                    colors = NavigationBarItemDefaults.colors(indicatorColor = Tertiary)
+                        restoreState = true
+                        launchSingleTop = true
+                    }
+                }, icon = {
+                    Icon(imageVector = item.icon, contentDescription = "${item.title} page")
+                }, label = {
+                    Text(text = item.title)
+                }, colors = NavigationBarItemDefaults.colors(indicatorColor = Tertiary)
                 )
+            }
+        }
+    }, topBar = {
+        when(route){
+            Screen.Dashboard.route ->{
+
+            }
+            Screen.Task.route -> {
+                CenterAlignedTopAppBar(title = { Text(text = "Daftar Tugas Patroli", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+            }
+            Screen.Profile.route -> {
+
             }
         }
     }) { padding ->
@@ -105,42 +100,45 @@ fun HomeView(
                 val viewModel = koinViewModel<DashboardViewModel>()
                 val state by viewModel.taskList.collectAsState()
                 val user by viewModel.user.collectAsState()
-                DashboardView(uiState = state,
+                val verifyState by viewModel.verifyState.collectAsState()
+                DashboardView(
+                    uiState = state,
                     user = user,
                     onProfileClicked = { /*TODO*/ },
                     onNotificationClicked = { /*TODO*/ },
-                    onItemClicked = {},
+                    navigateToDetailPage = {},
                     onRefreshTriggered = viewModel::getTask,
-                    modifier = Modifier.fillMaxSize(),
-                    setDialogData = {
-                        dialogData.value = it
-                    },
-                    setIsDialogShow = {
-                        isDialogShow.value = it
-                    }
+                    verifyUser = viewModel::verifyPatrol,
+                    verifyState = verifyState,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-            
+
             composable(
                 route = Screen.Task.route
-            ){
+            ) {
                 val viewModel = koinViewModel<TaskListViewModel>()
                 val state by viewModel.taskList.collectAsState()
-                
+                val user by viewModel.user.collectAsState()
+                val verifyState by viewModel.verifyState.collectAsState()
+
                 TaskListView(
                     uiState = state,
                     onRefreshTriggered = viewModel::getTask,
-                    setDialogData = {
-                                    dialogData.value = it
-                    },
-                    setIsDialogShow = {
-                        isDialogShow.value = it
-                    }
+                    verifyState = verifyState,
+                    user = user,
+                    navigateToDetailPage = {},
+                    verifyPatrolTask = viewModel::verifyPatrol,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-            composable(route = Screen.Profile.route){
+            composable(route = Screen.Profile.route) {
                 val context = LocalContext.current
-                Toast.makeText(context, "Halaman ini sedang dalam pembaruan", Toast.LENGTH_SHORT).show()
+                LaunchedEffect(key1 = true, block = {
+                    Toast.makeText(
+                        context, "Halaman ini sedang dalam pembaruan", Toast.LENGTH_SHORT
+                    ).show()
+                })
             }
         }
     }
