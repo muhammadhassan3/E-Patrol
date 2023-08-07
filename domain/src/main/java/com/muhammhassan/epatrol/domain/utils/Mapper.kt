@@ -8,7 +8,7 @@ object Mapper {
         return when(this){
             is ApiResponse.Error -> UiState.Error(this.message)
             ApiResponse.Loading -> UiState.Loading
-            is ApiResponse.Success -> UiState.Success(mutation.invoke(data))
+            is ApiResponse.Success -> UiState.Success(data?.let { mutation.invoke(it) })
         }
     }
 }
