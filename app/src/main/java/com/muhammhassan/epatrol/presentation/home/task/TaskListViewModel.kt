@@ -15,8 +15,18 @@ class TaskListViewModel(private val useCase: TaskListUseCase): ViewModel() {
     private val _taskList = MutableStateFlow<UiState<List<PatrolModel>>>(UiState.Loading)
     val taskList = _taskList.asStateFlow()
 
+    private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "",""))
+    val user = _user.asStateFlow()
+
+    private val _verifyState = MutableStateFlow<UiState<Nothing>?>(null)
+    val verifyState = _verifyState.asStateFlow()
 
     init{
+        viewModelScope.launch {
+            val user = useCase.getUser().first()
+            _user.value = user
+            return@launch
+        }
         getTask()
     }
 
@@ -24,6 +34,14 @@ class TaskListViewModel(private val useCase: TaskListUseCase): ViewModel() {
         viewModelScope.launch {
             useCase.getTaskList().collect{
                 _taskList.value = it
+            }
+        }
+    }
+
+    fun verifyPatrol(id: Long){
+        viewModelScope.launch {
+            useCase.verifyPatrolTask(id).collect{
+                _verifyState.value = it
             }
         }
     }
