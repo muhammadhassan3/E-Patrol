@@ -1,14 +1,16 @@
 package com.muhammhassan.epatrol.domain.interactor
 
 import com.muhammhassan.epatrol.core.repository.TaskRepository
+import com.muhammhassan.epatrol.core.repository.UserRepository
 import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.domain.model.UiState
+import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.domain.usecase.TaskListUseCase
 import com.muhammhassan.epatrol.domain.utils.Mapper.mapToUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class TaskListInteractor(private val task: TaskRepository): TaskListUseCase {
+class TaskListInteractor(private val task: TaskRepository, private val user: UserRepository): TaskListUseCase {
     override suspend fun getTaskList(): Flow<UiState<List<PatrolModel>>> {
         return task.getTaskList().map { response ->
             response.mapToUiState { list ->
@@ -21,10 +23,23 @@ class TaskListInteractor(private val task: TaskRepository): TaskListUseCase {
                         hour = it.jam,
                         lead = it.ketua,
                         verified = it.verified,
-                        address = it.alamat
+                        address = it.alamat,
+                        plate = it.plate
                     )
                 }
             }
+        }
+    }
+
+    override fun getUser(): Flow<UserModel> {
+        return user.getUser().map {
+            UserModel(it.name!!, "", it.email!!)
+        }
+    }
+
+    override suspend fun verifyPatrolTask(id: Long): Flow<UiState<Nothing>> {
+        return task.verifyPatrolTas(id).map {
+            it.mapToUiState { body -> body }
         }
     }
 }
