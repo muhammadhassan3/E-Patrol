@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
     suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>>
+
+    suspend fun verifyPatrolTas(id: Long): Flow<ApiResponse<Nothing>>
 }

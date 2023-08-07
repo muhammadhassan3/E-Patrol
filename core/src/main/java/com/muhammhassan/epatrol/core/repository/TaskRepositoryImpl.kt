@@ -9,4 +9,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource): TaskRe
     override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>> {
         return remoteDataSource.getTaskList()
     }
+
+    override suspend fun verifyPatrolTas(id: Long): Flow<ApiResponse<Nothing>> {
+        return remoteDataSource.verifyPatrol(id)
+    }
 }
