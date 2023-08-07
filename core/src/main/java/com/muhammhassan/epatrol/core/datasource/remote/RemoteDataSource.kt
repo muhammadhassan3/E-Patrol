@@ -9,4 +9,6 @@ interface RemoteDataSource {
     suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>>
 
     suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>>
+
+    suspend fun verifyPatrol(id: Long): Flow<ApiResponse<Nothing>>
 }
