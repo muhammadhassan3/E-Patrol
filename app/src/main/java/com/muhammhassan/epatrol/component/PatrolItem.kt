@@ -1,13 +1,13 @@
 package com.muhammhassan.epatrol.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -28,6 +28,8 @@ import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Green
 import com.muhammhassan.epatrol.ui.theme.Green20
+import com.muhammhassan.epatrol.ui.theme.Orange
+import com.muhammhassan.epatrol.ui.theme.Orange20
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
 import compose.icons.Octicons
@@ -36,9 +38,9 @@ import compose.icons.octicons.Clock24
 import compose.icons.octicons.KebabHorizontal24
 
 @Composable
-fun PatrolItem(model: PatrolModel, onItemClick: () -> Unit, modifier: Modifier = Modifier) {
+fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().clickable { onItemClick(model.id, model.plate) },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
@@ -49,31 +51,46 @@ fun PatrolItem(model: PatrolModel, onItemClick: () -> Unit, modifier: Modifier =
                 .padding(16.dp)
         ) {
             val (status, iconDate, date, iconHour, hour, title, targetAddress, menu) = createRefs()
-            if (model.status == "belum-dikerjakan") {
-                Text("Belum Dikerjakan",
-                    modifier = Modifier
-                        .constrainAs(status) {
-                            start.linkTo(parent.start)
-                            top.linkTo(parent.top)
-                        }
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Red20)
-                        .padding(12.dp, 2.dp),
-                    color = Red)
-            } else {
-                Text("Sedang Dikerjakan",
-                    modifier = Modifier
-                        .constrainAs(status) {
-                            start.linkTo(parent.start)
-                            top.linkTo(parent.top)
-                        }
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Green20)
-                        .padding(12.dp, 2.dp),
-                    color = Green)
+            when (model.status) {
+                "belum-dikerjakan" -> {
+                    Text("Belum Dikerjakan",
+                        modifier = Modifier
+                            .constrainAs(status) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                            }
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Red20)
+                            .padding(12.dp, 2.dp),
+                        color = Red)
+                }
+                "sedang-dikerjakan" -> {
+                    Text("Sedang Dikerjakan",
+                        modifier = Modifier
+                            .constrainAs(status) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                            }
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Orange20)
+                            .padding(12.dp, 2.dp),
+                        color = Orange)
+                }
+                else -> {
+                    Text("Selesai Dikerjakan",
+                        modifier = Modifier
+                            .constrainAs(status) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                            }
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Green20)
+                            .padding(12.dp, 2.dp),
+                        color = Green)
+                }
             }
 
-            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.constrainAs(menu) {
+            IconButton(onClick = {  }, modifier = Modifier.constrainAs(menu) {
                 end.linkTo(parent.end)
                 top.linkTo(parent.top)
                 width = Dimension.value(24.dp)
@@ -142,8 +159,9 @@ fun PatrolItemPreview() {
             hour = "20.00",
             address = "Jl. Dr. Soetomo",
             verified = false,
-            lead = "ade@email.co"
-        ), onItemClick = { /*TODO*/ })
+            lead = "ade@email.co",
+            plate = "R 0000 CH"
+        ), onItemClick = { _,_ ->/*TODO*/ })
     }
 }
 
@@ -160,7 +178,8 @@ fun PatrolItemPreview2() {
             hour = "20.00",
             address = "Jl. Dr. Soetomo",
             verified = false,
-            lead = "ade@email.co"
-        ), onItemClick = { /*TODO*/ })
+            lead = "ade@email.co",
+            plate = "R 0000 CH"
+        ), onItemClick = { _,_ ->/*TODO*/ })
     }
 }
