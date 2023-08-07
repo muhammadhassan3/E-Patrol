@@ -7,7 +7,6 @@ import com.muhammhassan.epatrol.domain.usecase.LoginUseCase
 import com.muhammhassan.epatrol.domain.utils.Mapper.mapToUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 class LoginInteractor(private val user: UserRepository): LoginUseCase {
     override suspend fun login(email: String, password: String): Flow<UiState<UserModel>> {

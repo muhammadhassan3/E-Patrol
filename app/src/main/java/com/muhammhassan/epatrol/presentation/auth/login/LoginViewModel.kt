@@ -1,19 +1,15 @@
 package com.muhammhassan.epatrol.presentation.auth.login
 
-import androidx.compose.runtime.MutableState
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.domain.usecase.LoginUseCase
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class LoginViewModel(private val useCase: LoginUseCase): ViewModel() {
     private val _email = MutableStateFlow("")
