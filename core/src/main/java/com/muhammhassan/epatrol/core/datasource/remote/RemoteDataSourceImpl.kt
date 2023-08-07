@@ -3,11 +3,13 @@ package com.muhammhassan.epatrol.core.datasource.remote
 import com.muhammhassan.epatrol.core.datasource.remote.api.ApiInterface
 import com.muhammhassan.epatrol.core.model.ApiResponse
 import com.muhammhassan.epatrol.core.model.LoginResponse
+import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolResponse
 import com.muhammhassan.epatrol.core.utils.Utils.parseError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 
 class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
     override suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>> =
@@ -23,7 +25,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
                 emit(ApiResponse.Error(response.parseError()))
             }
         }.catch { error ->
-            error.printStackTrace()
+            Timber.e(error)
             error.message?.let {
                 emit(ApiResponse.Error(it))
             }
@@ -41,7 +43,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
                 emit(ApiResponse.Error(response.parseError()))
             }
         }.catch { error ->
-            error.printStackTrace()
+            Timber.e(error)
             error.message?.let {
                 emit(ApiResponse.Error(it))
             }
@@ -56,8 +58,24 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
             emit(ApiResponse.Error(response.parseError()))
         }
     }.catch {
-        it.printStackTrace()
+        Timber.e(it)
+
         it.message?.let{message ->
+            emit(ApiResponse.Error(message))
+        }
+    }
+
+    override suspend fun getPatrolDetail(id: Long): Flow<ApiResponse<PatrolDetailResponse>> = flow{
+        emit(ApiResponse.Loading)
+        val response = api.getDetail(id)
+        if(response.isSuccessful){
+            emit(ApiResponse.Success(response.body()?.data))
+        }else{
+            emit(ApiResponse.Error(response.parseError()))
+        }
+    }.catch {
+        Timber.e(it)
+        it.message?.let {message ->
             emit(ApiResponse.Error(message))
         }
     }
