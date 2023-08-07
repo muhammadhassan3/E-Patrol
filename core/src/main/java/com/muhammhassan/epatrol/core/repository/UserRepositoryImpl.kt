@@ -7,12 +7,11 @@ import com.muhammhassan.epatrol.core.model.LoginResponse
 import com.muhammhassan.epatrol.core.model.UserModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 class UserRepositoryImpl(private val remote: RemoteDataSource, private val local: LocalDataSource): UserRepository {
     override suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>> {
         return remote.login(email, password).map {
-            if(it is ApiResponse.Success){
+            if(it is ApiResponse.Success && it.data != null){
                 local.setUser(email = it.data.user.email!!, nrp = it.data.user.nrp!!, nama = it.data.user.name!!)
             }
             it
