@@ -38,7 +38,7 @@ class TaskListInteractor(private val task: TaskRepository, private val user: Use
     }
 
     override suspend fun verifyPatrolTask(id: Long): Flow<UiState<Nothing>> {
-        return task.verifyPatrolTas(id).map {
+        return task.verifyPatrolTask(id).map {
             it.mapToUiState { body -> body }
         }
     }
