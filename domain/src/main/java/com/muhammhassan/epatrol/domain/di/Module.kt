@@ -16,7 +16,7 @@ object Module {
     val useCaseModule = module {
         single<LoginUseCase> { LoginInteractor(get()) }
         single<DashboardUseCase> { DashboardInteractor(get(), get()) }
-        single<TaskListUseCase> { TaskListInteractor(get()) }
+        single<TaskListUseCase> { TaskListInteractor(get(), get()) }
     }
 
     fun retrofit(version: Int) = provideApi(version)
