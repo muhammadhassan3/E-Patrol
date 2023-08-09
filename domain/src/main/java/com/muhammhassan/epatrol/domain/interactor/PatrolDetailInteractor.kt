@@ -1,5 +1,6 @@
 package com.muhammhassan.epatrol.domain.interactor
 
+import com.muhammhassan.epatrol.core.datasource.local.LocalDataSource
 import com.muhammhassan.epatrol.core.datasource.remote.RemoteDataSource
 import com.muhammhassan.epatrol.domain.model.PatrolDetailModel
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
@@ -9,7 +10,10 @@ import com.muhammhassan.epatrol.domain.utils.Mapper.mapToUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class PatrolDetailInteractor(private val remote: RemoteDataSource) : PatrolDetailUseCase {
+class PatrolDetailInteractor(
+    private val remote: RemoteDataSource,
+    private val local: LocalDataSource
+) : PatrolDetailUseCase {
     override suspend fun getDetailPatrol(id: Long): Flow<UiState<PatrolDetailModel>> {
         return remote.getPatrolDetail(id).map {
             it.mapToUiState { data ->
@@ -36,4 +40,9 @@ class PatrolDetailInteractor(private val remote: RemoteDataSource) : PatrolDetai
             }
         }
     }
+
+    override suspend fun getSavedEmail(): Flow<String?> {
+        return local.getEmail()
+    }
+
 }

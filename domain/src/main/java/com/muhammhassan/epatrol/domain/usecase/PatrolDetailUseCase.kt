@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PatrolDetailUseCase {
     suspend fun getDetailPatrol(id: Long): Flow<UiState<PatrolDetailModel>>
+
+    suspend fun getSavedEmail(): Flow<String?>
 }
