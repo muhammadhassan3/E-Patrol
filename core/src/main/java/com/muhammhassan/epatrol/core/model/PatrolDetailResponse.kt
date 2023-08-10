@@ -8,5 +8,6 @@ data class PatrolDetailResponse(
     val tanggal: String,
     val jam: String,
     val tujuan: String,
-    val events: List<PatrolEventResponse>
+    val events: List<PatrolEventResponse>,
+    val lead: String,
 )

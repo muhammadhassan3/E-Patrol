@@ -8,5 +8,6 @@ data class PatrolDetailModel(
     val tanggal: String,
     val jam: String,
     val tujuan: String,
-    val events: List<PatrolEventModel>
+    val events: List<PatrolEventModel>,
+    val lead: String,
 )
