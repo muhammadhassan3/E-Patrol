@@ -18,6 +18,8 @@
             android:theme="@style/Theme.EPatrol"/>
         <activity android:name=".presentation.home.HomeActivity"
             android:theme="@style/Theme.EPatrol"/>
+        <activity android:name=".presentation.patrol.PatrolDetailActivity"
+            android:theme="@style/Theme.EPatrol"/>
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="true"
