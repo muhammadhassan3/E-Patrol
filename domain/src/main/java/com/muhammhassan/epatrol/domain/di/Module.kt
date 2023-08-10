@@ -19,7 +19,7 @@ object Module {
         single<LoginUseCase> { LoginInteractor(get()) }
         single<DashboardUseCase> { DashboardInteractor(get(), get()) }
         single<TaskListUseCase> { TaskListInteractor(get(), get()) }
-        single<PatrolDetailUseCase> { PatrolDetailInteractor(get()) }
+        single<PatrolDetailUseCase> { PatrolDetailInteractor(get(), get()) }
     }
 
     fun retrofit(version: Int) = provideApi(version)
