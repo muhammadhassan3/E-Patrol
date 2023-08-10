@@ -1,5 +1,6 @@
 package com.muhammhassan.epatrol.presentation.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,18 +8,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.muhammhassan.epatrol.presentation.patrol.PatrolDetailActivity
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 
-class HomeActivity: ComponentActivity() {
+class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent{
+        setContent {
             EPatrolTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    HomeView()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    HomeView(navigateToDetailPage = {
+                        navigateToDetailPatrol(it)
+                    })
                 }
             }
         }
+    }
+
+    private fun navigateToDetailPatrol(id: Long) {
+        val intent = Intent(this, PatrolDetailActivity::class.java)
+        intent.putExtra(PatrolDetailActivity.id, id)
+        startActivity(intent)
     }
 }
