@@ -43,10 +43,11 @@ fun ExpandableCard(
     title: String,
     content: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
+    defaultExpandedValue: Boolean = false,
     containerColor: Color = Color.White,
 ) {
     val isContentExpand = remember {
-        mutableStateOf(false)
+        mutableStateOf(defaultExpandedValue)
     }
     val angleAnimation = animateFloatAsState(
         targetValue = if (isContentExpand.value) 270f else 90f, label = "Rotate button"
@@ -54,12 +55,12 @@ fun ExpandableCard(
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
+        colors = CardDefaults.elevatedCardColors(containerColor = containerColor)
     ) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .padding(12.dp)
                 .animateContentSize()
         ) {
             val (titleConst, indicator, expandButton, contentConst) = createRefs()
