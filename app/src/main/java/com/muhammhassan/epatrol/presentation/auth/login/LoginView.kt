@@ -13,11 +13,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
@@ -44,19 +48,19 @@ import com.muhammhassan.epatrol.ui.theme.Secondary
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
+import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
-    state: UiState<UserModel>?,
-    email: String,
-    onEmailChanged: (value: String) -> Unit,
-    password: String,
-    onPasswordChanged: (value: String) -> Unit,
-    onSaveButton: () -> Unit,
     onResponseSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel = koinViewModel<LoginViewModel>()
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val password by viewModel.password.collectAsStateWithLifecycle()
+
     val isPasswordShow = remember { mutableStateOf(false) }
     val isLoading = remember {
         mutableStateOf(false)
@@ -68,11 +72,13 @@ fun LoginView(
         mutableStateOf(false)
     }
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(key1 = state, block = {
         when (state) {
             is UiState.Error -> {
                 isLoading.value = false
-                dialogData.value = state.message
+                dialogData.value = (state as UiState.Error).message
                 isDialogShow.value = true
             }
 
@@ -88,6 +94,7 @@ fun LoginView(
             null -> {}
         }
     })
+
 
     if (isDialogShow.value) {
         AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
@@ -140,7 +147,7 @@ fun LoginView(
         } else {
             OutlinedTextField(
                 value = email,
-                onValueChange = onEmailChanged,
+                onValueChange = viewModel::setEmail,
                 modifier = Modifier.constrainAs(edtEmail) {
                     top.linkTo(subtitle.bottom, 16.dp)
                     start.linkTo(parent.start, 16.dp)
@@ -155,12 +162,12 @@ fun LoginView(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 ),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Primary
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Primary,
                 )
             )
             OutlinedTextField(value = password,
-                onValueChange = onPasswordChanged,
+                onValueChange = viewModel::setPassword,
                 modifier = Modifier.constrainAs(edtPassword) {
                     top.linkTo(edtEmail.bottom, 8.dp)
                     start.linkTo(parent.start, 16.dp)
@@ -175,8 +182,8 @@ fun LoginView(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Go
                 ),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Primary
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Primary,
                 ),
                 visualTransformation = if (isPasswordShow.value) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -192,7 +199,7 @@ fun LoginView(
                 top.linkTo(edtPassword.bottom, 8.dp)
             }, fontWeight = FontWeight.Medium, color = Primary)
             Button(
-                onClick = onSaveButton,
+                onClick = viewModel::login,
                 modifier = Modifier.constrainAs(btnMasuk) {
                     start.linkTo(parent.start, 16.dp)
                     end.linkTo(parent.end, 16.dp)
@@ -227,12 +234,7 @@ fun LoginView(
 @Composable
 fun LoginPreview() {
     EPatrolTheme {
-        LoginView(email = "",
-            onEmailChanged = {},
-            onSaveButton = {},
-            password = "",
-            onPasswordChanged = {},
-            state = null,
+        LoginView(
             onResponseSuccess = {})
     }
 }
@@ -241,12 +243,7 @@ fun LoginPreview() {
 @Composable
 fun LoginPreview2() {
     EPatrolTheme {
-        LoginView(email = "",
-            onEmailChanged = {},
-            onSaveButton = {},
-            password = "",
-            onPasswordChanged = {},
-            state = UiState.Loading,
+        LoginView(
             onResponseSuccess = {})
     }
 }
