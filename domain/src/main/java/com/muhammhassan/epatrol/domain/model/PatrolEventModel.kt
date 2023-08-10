@@ -1,5 +1,9 @@
 package com.muhammhassan.epatrol.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class PatrolEventModel(
     val id: Long,
     val image: String,
@@ -9,4 +13,4 @@ data class PatrolEventModel(
     val lat: Double,
     val long: Double,
     val createdAt: String,
-)
+): Parcelable
