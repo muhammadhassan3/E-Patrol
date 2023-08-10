@@ -6,9 +6,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
@@ -99,15 +100,17 @@ fun ExpandableCard(
                 Column(modifier = Modifier.constrainAs(contentConst) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(expandButton.bottom, 16.dp)
+                    top.linkTo(expandButton.bottom)
                 }) {
                     AnimatedVisibility(
                         visible = isContentExpand.value,
                         enter = fadeIn(),
-                        exit = fadeOut()
+                        exit = fadeOut(),
                     ) {
-                        Divider(modifier = Modifier)
-                        Box(modifier = Modifier) {
+                        Column {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Divider(modifier = Modifier)
+                            Spacer(modifier = Modifier.height(8.dp))
                             content()
                         }
                     }
