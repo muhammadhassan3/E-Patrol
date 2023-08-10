@@ -45,7 +45,9 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
-    modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()
+    navigateToDetailPage: (id: Long) -> Unit,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
 ) {
     val navigation = listOf(
         NavigationItem("Beranda", Octicons.Home24, screen = Screen.Dashboard),
@@ -77,13 +79,20 @@ fun HomeView(
             }
         }
     }, topBar = {
-        when(route){
-            Screen.Dashboard.route ->{
+        when (route) {
+            Screen.Dashboard.route -> {
 
             }
+
             Screen.Task.route -> {
-                CenterAlignedTopAppBar(title = { Text(text = "Daftar Tugas Patroli", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                CenterAlignedTopAppBar(title = {
+                    Text(
+                        text = "Daftar Tugas Patroli",
+                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    )
+                })
             }
+
             Screen.Profile.route -> {
 
             }
@@ -101,12 +110,11 @@ fun HomeView(
                 val state by viewModel.taskList.collectAsState()
                 val user by viewModel.user.collectAsState()
                 val verifyState by viewModel.verifyState.collectAsState()
-                DashboardView(
-                    uiState = state,
+                DashboardView(uiState = state,
                     user = user,
                     onProfileClicked = { /*TODO*/ },
                     onNotificationClicked = { /*TODO*/ },
-                    navigateToDetailPage = {},
+                    navigateToDetailPage = { navigateToDetailPage(it) },
                     onRefreshTriggered = viewModel::getTask,
                     verifyUser = viewModel::verifyPatrol,
                     verifyState = verifyState,
@@ -148,6 +156,6 @@ fun HomeView(
 @Composable
 fun HomePreview() {
     EPatrolTheme {
-        HomeView()
+        HomeView(navigateToDetailPage = {})
     }
 }
