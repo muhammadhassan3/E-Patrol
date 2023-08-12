@@ -9,4 +9,5 @@ data class PatrolEventResponse(
     val lat: Double,
     val long: Double,
     val createdAt: String,
+    val author: String
 )
