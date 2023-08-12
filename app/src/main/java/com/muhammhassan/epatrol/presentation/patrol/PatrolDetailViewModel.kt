@@ -18,6 +18,8 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
 
+    var patrolId = 0L
+
     init {
         viewModelScope.launch {
             val email = useCase.getSavedEmail().first()
@@ -27,6 +29,7 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
     }
 
     fun getDetail(id: Long) {
+        patrolId = id
         viewModelScope.launch {
             useCase.getDetailPatrol(id).collect {
                 _state.value = it
