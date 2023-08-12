@@ -1,5 +1,6 @@
 package com.muhammhassan.epatrol.presentation.patrol
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
+import com.muhammhassan.epatrol.presentation.patrol.event.EventDetailActivity
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -43,7 +45,10 @@ class PatrolDetailActivity : ComponentActivity() {
     }
 
     private fun navigateToDetailEvent(data: PatrolEventModel) {
-
+        val intent = Intent(this, EventDetailActivity::class.java)
+        intent.putExtra(EventDetailActivity.patrolId, viewModel.patrolId)
+        intent.putExtra(EventDetailActivity.eventData, data)
+        startActivity(intent)
     }
 
     companion object {
