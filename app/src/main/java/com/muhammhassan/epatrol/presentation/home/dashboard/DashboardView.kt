@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import coil.compose.SubcomposeAsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.muhammhassan.epatrol.component.LoadingDialog
 import com.muhammhassan.epatrol.component.PatrolItem
 import com.muhammhassan.epatrol.component.VerifyBottomSheetView
@@ -57,9 +57,7 @@ import compose.icons.octicons.Person24
 import kotlinx.coroutines.launch
 
 @OptIn(
-    ExperimentalGlideComposeApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun DashboardView(
@@ -74,8 +72,7 @@ fun DashboardView(
     modifier: Modifier = Modifier
 ) {
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true,
         confirmValueChange = { it != SheetValue.Expanded })
     val scope = rememberCoroutineScope()
     val isSheetShow = remember {
@@ -227,13 +224,13 @@ fun DashboardView(
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
-                GlideImage(
-                    model = user.profileImage,
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current).data(user.profileImage)
+                        .crossfade(true).diskCacheKey(user.profileImage)
+                        .diskCachePolicy(CachePolicy.ENABLED).build(),
                     contentDescription = "Profile Picture",
                     contentScale = ContentScale.Crop
-                ) {
-                    it.error(Octicons.Person24).diskCacheStrategy(DiskCacheStrategy.DATA)
-                }
+                )
             }
         } else {
             IconButton(onClick = onProfileClicked, modifier = Modifier.constrainAs(profile) {
@@ -263,27 +260,26 @@ fun DashboardView(
             )
         )
 
-        LazyColumn(
-            content = {
-                items(listData, key = { it.id }) {
-                    PatrolItem(model = it, onItemClick = { id, plate ->
-                        if (it.verified) {
-                            navigateToDetailPage.invoke(id)
-                            return@PatrolItem
-                        }
-                        if (it.lead == user.email) {
-                            scope.launch { sheetState.show() }
-                            isSheetShow.value = true
-                            setSelectedId(id)
-                            setSelectedPlate(plate)
-                        } else {
-                            dialogMessage.value =
-                                "Perlengkapan patroli ini belum dicek, silahkan tunggu ketua regu untuk melakukan verifikasi kemudian lakukan refresh pada halaman ini."
-                            isDialogShow.value = true
-                        }
-                    }, modifier = Modifier)
-                }
-            },
+        LazyColumn(content = {
+            items(listData, key = { it.id }) {
+                PatrolItem(model = it, onItemClick = { id, plate ->
+                    if (it.verified) {
+                        navigateToDetailPage.invoke(id)
+                        return@PatrolItem
+                    }
+                    if (it.lead == user.email) {
+                        scope.launch { sheetState.show() }
+                        isSheetShow.value = true
+                        setSelectedId(id)
+                        setSelectedPlate(plate)
+                    } else {
+                        dialogMessage.value =
+                            "Perlengkapan patroli ini belum dicek, silahkan tunggu ketua regu untuk melakukan verifikasi kemudian lakukan refresh pada halaman ini."
+                        isDialogShow.value = true
+                    }
+                }, modifier = Modifier)
+            }
+        },
             state = scrollState,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -296,15 +292,14 @@ fun DashboardView(
                     height = Dimension.fillToConstraints
                 }
                 .pullRefresh(pullRefreshState),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
-        )
-        PullRefreshIndicator(
-            refreshing = swipeLoading.value, state = pullRefreshState, modifier = Modifier.constrainAs(indicator){
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp))
+        PullRefreshIndicator(refreshing = swipeLoading.value,
+            state = pullRefreshState,
+            modifier = Modifier.constrainAs(indicator) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 top.linkTo(content.top)
-            }
-        )
+            })
     }
 }
 
@@ -332,7 +327,8 @@ fun DashboardPreview() {
             navigateToDetailPage = {},
             onNotificationClicked = {},
             onRefreshTriggered = {},
-            verifyUser = {}, verifyState = null
+            verifyUser = {},
+            verifyState = null
         )
     }
 }
