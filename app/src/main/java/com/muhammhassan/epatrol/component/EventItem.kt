@@ -117,7 +117,8 @@ fun EventItemPreview() {
                 "Evakuasi korban",
                 createdAt = "2 Juni 2023 13:24",
                 lat = 0.0,
-                long = 0.0
+                long = 0.0,
+                author = "budi@gmail.com"
             ),
             onItemClick = {}
         )
