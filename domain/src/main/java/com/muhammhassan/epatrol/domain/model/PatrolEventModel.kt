@@ -13,4 +13,5 @@ data class PatrolEventModel(
     val lat: Double,
     val long: Double,
     val createdAt: String,
+    val author: String,
 ): Parcelable
