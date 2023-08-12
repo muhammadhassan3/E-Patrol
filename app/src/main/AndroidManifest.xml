@@ -20,6 +20,10 @@
             android:theme="@style/Theme.EPatrol"/>
         <activity android:name=".presentation.patrol.PatrolDetailActivity"
             android:theme="@style/Theme.EPatrol"/>
+        <activity android:name=".presentation.patrol.event.EventDetailActivity"
+            android:theme="@style/Theme.EPatrol"/>
+        <activity android:name=".presentation.patrol.event.add.AddEventActivity"
+            android:theme="@style/Theme.EPatrol"/>
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="true"
