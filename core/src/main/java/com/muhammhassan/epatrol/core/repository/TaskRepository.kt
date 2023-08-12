@@ -11,4 +11,6 @@ interface TaskRepository {
     suspend fun verifyPatrolTask(id: Long): Flow<ApiResponse<Nothing>>
 
     suspend fun getDetailPatrol(id: Long): Flow<ApiResponse<PatrolDetailResponse>>
+
+    suspend fun deletePatrolEvent(patrolId: Long, eventId: Long): Flow<ApiResponse<Nothing>>
 }

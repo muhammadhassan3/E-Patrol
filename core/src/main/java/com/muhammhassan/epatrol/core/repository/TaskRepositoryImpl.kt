@@ -18,4 +18,11 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource): TaskRe
     override suspend fun getDetailPatrol(id: Long): Flow<ApiResponse<PatrolDetailResponse>> {
         return remoteDataSource.getPatrolDetail(id)
     }
+
+    override suspend fun deletePatrolEvent(
+        patrolId: Long,
+        eventId: Long
+    ): Flow<ApiResponse<Nothing>> {
+        return remoteDataSource.deletePatrolEvent(patrolId, eventId)
+    }
 }

@@ -79,4 +79,22 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
             emit(ApiResponse.Error(message))
         }
     }
+
+    override suspend fun deletePatrolEvent(
+        patrolId: Long,
+        eventId: Long
+    ): Flow<ApiResponse<Nothing>> = flow {
+        emit(ApiResponse.Loading)
+        val response = api.deleteEvent(patrolId, eventId)
+        if (response.isSuccessful){
+            emit(ApiResponse.Success(null))
+        }else{
+            emit(ApiResponse.Error(response.parseError()))
+        }
+    }.catch {
+        Timber.e(it)
+        it.message?.let { message ->
+            emit(ApiResponse.Error(message))
+        }
+    }
 }

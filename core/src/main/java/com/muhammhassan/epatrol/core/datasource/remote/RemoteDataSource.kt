@@ -14,4 +14,6 @@ interface RemoteDataSource {
     suspend fun verifyPatrol(id: Long): Flow<ApiResponse<Nothing>>
 
     suspend fun getPatrolDetail(id: Long): Flow<ApiResponse<PatrolDetailResponse>>
+
+    suspend fun deletePatrolEvent(patrolId: Long, eventId: Long): Flow<ApiResponse<Nothing>>
 }
