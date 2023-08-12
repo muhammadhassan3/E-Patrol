@@ -5,6 +5,7 @@ import com.muhammhassan.epatrol.core.model.LoginResponse
 import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolResponse
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -28,4 +29,7 @@ interface ApiInterface {
 
     @GET("patrol/{id}")
     suspend fun getDetail(@Path("id")id: Long): Response<BaseResponse<PatrolDetailResponse>>
+
+    @DELETE("patrol/{patrolId}/{eventId}")
+    suspend fun deleteEvent(@Path("patrolId") patrolId: Long, @Path("eventId") eventId: Long): Response<BaseResponse<Nothing>>
 }
