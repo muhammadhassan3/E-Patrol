@@ -35,6 +35,7 @@ class PatrolDetailInteractor(
                             event.lat,
                             event.long,
                             event.createdAt,
+                            author = event.author
                         )
                     }, lead = data.lead)
             }
