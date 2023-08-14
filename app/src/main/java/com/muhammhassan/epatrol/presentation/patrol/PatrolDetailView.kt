@@ -54,7 +54,7 @@ import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Secondary
-import com.muhammhassan.epatrol.utils.Utils
+import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Calendar24
@@ -236,7 +236,7 @@ fun HeaderCard(
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (statusConst, titleConst, sprinConst, footerConst, iconCalendar, calendarConst, iconTime, timeConst) = createRefs()
             val verticalGuideline = createGuidelineFromStart(0.8f)
-            Text(text = Utils.getStatus(status),
+            Text(text = getDisplayStatus(status),
                 modifier = Modifier
                     .constrainAs(statusConst) {
                         start.linkTo(parent.start, 16.dp)

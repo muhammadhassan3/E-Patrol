@@ -32,7 +32,7 @@ import com.muhammhassan.epatrol.ui.theme.Orange
 import com.muhammhassan.epatrol.ui.theme.Orange20
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
-import com.muhammhassan.epatrol.utils.Utils
+import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.Calendar24
 import compose.icons.octicons.Clock24
@@ -54,7 +54,7 @@ fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Uni
             val (status, iconDate, date, iconHour, hour, title, targetAddress, menu) = createRefs()
             when (model.status) {
                 "belum-dikerjakan" -> {
-                    Text(Utils.getStatus(model.status),
+                    Text(getDisplayStatus(model.status),
                         modifier = Modifier
                             .constrainAs(status) {
                                 start.linkTo(parent.start)
@@ -66,7 +66,7 @@ fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Uni
                         color = Red)
                 }
                 "sedang-dikerjakan" -> {
-                    Text(Utils.getStatus(model.status),
+                    Text(getDisplayStatus(model.status),
                         modifier = Modifier
                             .constrainAs(status) {
                                 start.linkTo(parent.start)
@@ -79,7 +79,7 @@ fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Uni
                 }
                 else -> {
                     Text(
-                        Utils.getStatus(model.status),
+                        getDisplayStatus(model.status),
                         modifier = Modifier
                             .constrainAs(status) {
                                 start.linkTo(parent.start)
