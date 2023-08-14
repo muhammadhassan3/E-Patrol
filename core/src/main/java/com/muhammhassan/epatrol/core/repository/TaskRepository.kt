@@ -20,6 +20,8 @@ interface TaskRepository {
         event: String,
         summary: String,
         action: String,
-        image: File
+        image: File,
+        latitude: Double,
+        longitude: Double
     ): Flow<ApiResponse<Nothing>>
 }

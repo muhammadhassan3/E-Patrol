@@ -23,6 +23,8 @@ interface RemoteDataSource {
         event: String,
         summary: String,
         action: String,
-        image: File
+        image: File,
+        lat: Double,
+        long: Double
     ): Flow<ApiResponse<Nothing>>
 }

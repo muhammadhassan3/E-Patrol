@@ -27,8 +27,22 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
     }
 
     override suspend fun addPatrolEvent(
-        patrolId: Long, event: String, summary: String, action: String, image: File
+        patrolId: Long,
+        event: String,
+        summary: String,
+        action: String,
+        image: File,
+        latitude: Double,
+        longitude: Double
     ): Flow<ApiResponse<Nothing>> {
-        return remoteDataSource.addPatrolEvent(patrolId, event, summary, action, image)
+        return remoteDataSource.addPatrolEvent(
+            patrolId,
+            event,
+            summary,
+            action,
+            image,
+            latitude,
+            longitude
+        )
     }
 }

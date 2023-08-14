@@ -21,8 +21,7 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST("login")
     suspend fun login(
-        @Field("email") email: String,
-        @Field("password") password: String
+        @Field("email") email: String, @Field("password") password: String
     ): Response<BaseResponse<LoginResponse>>
 
     @GET("patrol/")
@@ -32,12 +31,23 @@ interface ApiInterface {
     suspend fun verifyPatrol(@Path("id") id: Long): Response<BaseResponse<Nothing>>
 
     @GET("patrol/{id}")
-    suspend fun getDetail(@Path("id")id: Long): Response<BaseResponse<PatrolDetailResponse>>
+    suspend fun getDetail(@Path("id") id: Long): Response<BaseResponse<PatrolDetailResponse>>
 
     @DELETE("patrol/{patrolId}/{eventId}")
-    suspend fun deleteEvent(@Path("patrolId") patrolId: Long, @Path("eventId") eventId: Long): Response<BaseResponse<Nothing>>
+    suspend fun deleteEvent(
+        @Path("patrolId") patrolId: Long,
+        @Path("eventId") eventId: Long
+    ): Response<BaseResponse<Nothing>>
 
     @Multipart
     @POST("patrol/{patrolId}/")
-    suspend fun addEvent(@Path("patrolId") patrolId: Long, @Part image: MultipartBody.Part, @Part("event") event: RequestBody, @Part("action") action: RequestBody, @Part("summary") summary: RequestBody): Response<BaseResponse<Nothing>>
+    suspend fun addEvent(
+        @Path("patrolId") patrolId: Long,
+        @Part image: MultipartBody.Part,
+        @Part("event") event: RequestBody,
+        @Part("action") action: RequestBody,
+        @Part("summary") summary: RequestBody,
+        @Part("lat") latitude: RequestBody,
+        @Part("long") longitude: RequestBody
+    ): Response<BaseResponse<Nothing>>
 }
