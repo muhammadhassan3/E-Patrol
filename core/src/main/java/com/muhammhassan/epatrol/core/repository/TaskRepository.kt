@@ -1,5 +1,6 @@
 package com.muhammhassan.epatrol.core.repository
 
+import android.net.Uri
 import com.muhammhassan.epatrol.core.model.ApiResponse
 import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolResponse
@@ -13,4 +14,6 @@ interface TaskRepository {
     suspend fun getDetailPatrol(id: Long): Flow<ApiResponse<PatrolDetailResponse>>
 
     suspend fun deletePatrolEvent(patrolId: Long, eventId: Long): Flow<ApiResponse<Nothing>>
+
+    suspend fun addPatrolEvent(patrolId: Long, event: String, summary: String, action: String, image: Uri): Flow<ApiResponse<Nothing>>
 }

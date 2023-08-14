@@ -1,5 +1,6 @@
 package com.muhammhassan.epatrol.core.datasource.remote
 
+import android.net.Uri
 import com.muhammhassan.epatrol.core.datasource.remote.api.ApiInterface
 import com.muhammhassan.epatrol.core.model.ApiResponse
 import com.muhammhassan.epatrol.core.model.LoginResponse
@@ -95,6 +96,27 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         Timber.e(it)
         it.message?.let { message ->
             emit(ApiResponse.Error(message))
+        }
+    }
+
+    override suspend fun addPatrolEvent(
+        patrolId: Long,
+        event: String,
+        summary: String,
+        action: String,
+        image: Uri
+    ): Flow<ApiResponse<Nothing>> = flow {
+        emit(ApiResponse.Loading)
+        val response = api.addEvent(patrolId)
+        if(response.isSuccessful){
+            emit(ApiResponse.Success(null))
+        }else{
+            emit(ApiResponse.Error(response.parseError()))
+        }
+    }.catch {
+        Timber.e(it)
+        it.message?.let{message ->
+            emit(ApiResponse.Error(message = message))
         }
     }
 }
