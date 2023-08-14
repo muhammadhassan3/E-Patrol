@@ -1,11 +1,11 @@
 package com.muhammhassan.epatrol.core.datasource.remote
 
-import android.net.Uri
 import com.muhammhassan.epatrol.core.model.ApiResponse
 import com.muhammhassan.epatrol.core.model.LoginResponse
 import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolResponse
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface RemoteDataSource {
     suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>>
@@ -23,6 +23,6 @@ interface RemoteDataSource {
         event: String,
         summary: String,
         action: String,
-        image: Uri
+        image: File
     ): Flow<ApiResponse<Nothing>>
 }
