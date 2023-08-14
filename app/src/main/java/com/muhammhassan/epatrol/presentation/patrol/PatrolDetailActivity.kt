@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.presentation.patrol.event.EventDetailActivity
+import com.muhammhassan.epatrol.presentation.patrol.event.add.AddEventActivity
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -41,7 +42,9 @@ class PatrolDetailActivity : ComponentActivity() {
     }
 
     private fun navigateToAddEvent(patrolId: Long) {
-
+        val intent = Intent(this, AddEventActivity::class.java)
+        intent.putExtra(AddEventActivity.patrolId, patrolId)
+        startActivity(intent)
     }
 
     private fun navigateToDetailEvent(data: PatrolEventModel) {
