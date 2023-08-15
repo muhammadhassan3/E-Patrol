@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.presentation.patrol.event.EventDetailActivity
 import com.muhammhassan.epatrol.presentation.patrol.event.add.AddEventActivity
@@ -26,6 +27,7 @@ class PatrolDetailActivity : ComponentActivity() {
             EPatrolTheme {
                 val state by viewModel.state.collectAsState()
                 val email by viewModel.email.collectAsState()
+                val markAsDoneState by viewModel.confirmState.collectAsStateWithLifecycle()
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
@@ -34,7 +36,10 @@ class PatrolDetailActivity : ComponentActivity() {
                         userEmail = email,
                         state = state,
                         navigateToAddEvent = ::navigateToAddEvent,
-                        navigateToDetailEvent = ::navigateToDetailEvent
+                        navigateToDetailEvent = ::navigateToDetailEvent,
+                        confirmState = markAsDoneState,
+                        onCompleteSuccess = ::completedPatrolAction,
+                        markAsDonePatrol = viewModel::verify
                     )
                 }
             }
@@ -52,6 +57,11 @@ class PatrolDetailActivity : ComponentActivity() {
         intent.putExtra(EventDetailActivity.patrolId, viewModel.patrolId)
         intent.putExtra(EventDetailActivity.eventData, data)
         startActivity(intent)
+    }
+
+    private fun completedPatrolAction(){
+        setResult(RESULT_OK)
+        finish()
     }
 
     companion object {

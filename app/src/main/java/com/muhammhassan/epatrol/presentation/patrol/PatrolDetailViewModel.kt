@@ -15,6 +15,9 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
     private val _state = MutableStateFlow<UiState<PatrolDetailModel>>(UiState.Loading)
     val state = _state.asStateFlow()
 
+    private val _confirmState = MutableStateFlow<UiState<Nothing>?>(null)
+    val confirmState = _confirmState.asStateFlow()
+
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
 
@@ -33,6 +36,14 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
         viewModelScope.launch {
             useCase.getDetailPatrol(id).collect {
                 _state.value = it
+            }
+        }
+    }
+
+    fun verify(id:Long){
+        viewModelScope.launch {
+            useCase.markAsDone(id).collect{
+                _confirmState.value = it
             }
         }
     }
