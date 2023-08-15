@@ -4,6 +4,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,8 +48,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.muhammhassan.epatrol.component.ConfirmDialogView
 import com.muhammhassan.epatrol.component.EventItem
 import com.muhammhassan.epatrol.component.ExpandableCard
 import com.muhammhassan.epatrol.component.LoadingDialog
@@ -53,12 +59,13 @@ import com.muhammhassan.epatrol.domain.model.PatrolDetailModel
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
+import com.muhammhassan.epatrol.ui.theme.Red
+import com.muhammhassan.epatrol.ui.theme.Red20
 import com.muhammhassan.epatrol.ui.theme.Secondary
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Calendar24
-import compose.icons.octicons.Checklist24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.Plus24
 
@@ -70,6 +77,9 @@ fun PatrolDetailView(
     navigateToAddEvent: (id: Long) -> Unit,
     navigateToDetailEvent: (id: PatrolEventModel) -> Unit,
     state: UiState<PatrolDetailModel>,
+    confirmState: UiState<Nothing>?,
+    markAsDonePatrol: (patrolId: Long) -> Unit,
+    onCompleteSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (data, setData) = remember {
@@ -98,6 +108,10 @@ fun PatrolDetailView(
         mutableStateOf("")
     }
 
+    val isConfirmDialogShow = remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(key1 = state, block = {
         when (state) {
             is UiState.Error -> {
@@ -117,6 +131,27 @@ fun PatrolDetailView(
         }
     })
 
+    LaunchedEffect(key1 = confirmState, block = {
+        when (confirmState) {
+            is UiState.Error -> {
+                setLoading(false)
+                setDialogMessage(confirmState.message)
+                setDialogShow(true)
+            }
+
+            UiState.Loading -> {
+                setLoading(true)
+            }
+
+            is UiState.Success -> {
+                setLoading(false)
+                onCompleteSuccess.invoke()
+            }
+
+            null -> {}
+        }
+    })
+
     if (isDialogShow) {
         AlertDialog(onDismissRequest = { setDialogShow(false) }, confirmButton = {
             TextButton(onClick = { setDialogShow(false) }) {
@@ -127,6 +162,15 @@ fun PatrolDetailView(
 
     if (isLoading) {
         LoadingDialog(onDismiss = { setLoading(false) })
+    }
+
+    if (isConfirmDialogShow.value) {
+        Dialog(onDismissRequest = { isConfirmDialogShow.value }) {
+            ConfirmDialogView(
+                message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
+                onDismiss = { isConfirmDialogShow.value = false },
+                onConfirm = { markAsDonePatrol.invoke(data.id) })
+        }
     }
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
@@ -140,8 +184,7 @@ fun PatrolDetailView(
         }, actions = {
             PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
                 IconButton(
-                    onClick = { navigateToAddEvent(data.id) },
-                    modifier = Modifier.tooltipAnchor()
+                    onClick = { navigateToAddEvent(data.id) }, modifier = Modifier.tooltipAnchor()
                 ) {
                     Icon(
                         painter = rememberVectorPainter(image = Octicons.Plus24),
@@ -149,51 +192,66 @@ fun PatrolDetailView(
                     )
                 }
             }
-            if (userEmail == data.lead) {
-                PlainTooltipBox(tooltip = { Text(text = "Selesaikan") }) {
-                    IconButton(
-                        onClick = { navigateToAddEvent(data.id) },
-                        modifier = Modifier.tooltipAnchor()
-                    ) {
-                        Icon(
-                            painter = rememberVectorPainter(image = Octicons.Checklist24),
-                            contentDescription = "Tambah"
-                        )
+        })
+    }) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            LazyColumn(
+                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    HeaderCard(
+                        title = data.title,
+                        status = data.status,
+                        sprin = data.sprin,
+                        date = data.tanggal,
+                        hour = data.jam
+                    )
+                }
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        ExpandableCard(title = "Tujuan", content = {
+                            Text(text = data.tujuan)
+                        }, modifier = Modifier, containerColor = Color.White)
+                    }
+                }
+
+                item {
+                    Row(modifier = Modifier.padding(16.dp)) {
+                        ExpandableCard(title = "Daftar Kejadian", content = {
+                            data.events.forEach {
+                                EventItem(data = it, onItemClick = navigateToDetailEvent)
+                            }
+                        }, defaultExpandedValue = true)
                     }
                 }
             }
-        })
-    }) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            item {
-                HeaderCard(
-                    title = data.title,
-                    status = data.status,
-                    sprin = data.sprin,
-                    date = data.tanggal,
-                    hour = data.jam
-                )
-            }
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    ExpandableCard(title = "Tujuan", content = {
-                        Text(text = data.tujuan)
-                    }, modifier = Modifier, containerColor = Color.White)
-                }
-            }
-
-            item {
-                Row(modifier = Modifier.padding(16.dp)) {
-                    ExpandableCard(title = "Daftar Kejadian", content = {
-                        data.events.forEach {
-                            EventItem(data = it, onItemClick = navigateToDetailEvent)
+            if (userEmail == data.lead) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(
+                        topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
+                    ), colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp)
+                    ) {
+                        Button(
+                            onClick = { isConfirmDialogShow.value = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Red20),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            Text(
+                                text = "Tambah Kejadian",
+                                style = TextStyle(fontSize = 16.sp, color = Red)
+                            )
                         }
-                    }, defaultExpandedValue = true)
+                    }
                 }
             }
         }
@@ -349,6 +407,9 @@ fun PatrolDetailPreview() {
             onNavUp = {},
             userEmail = "budi@gmail.com",
             navigateToAddEvent = {},
-            navigateToDetailEvent = {})
+            navigateToDetailEvent = {},
+            confirmState = null,
+            markAsDonePatrol = {},
+            onCompleteSuccess = {})
     }
 }
