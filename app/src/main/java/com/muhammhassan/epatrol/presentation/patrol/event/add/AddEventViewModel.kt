@@ -49,6 +49,10 @@ class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
 
     fun save(context: Context) {
         viewModelScope.launch {
+            if(latitude == 0.0 || longitude == 0.0){
+                _state.value = UiState.Error("Data lokasi tidak ditemukan, silahkan coba beberapa saat lagi")
+                return@launch
+            }
             if (image.value != null) {
                 useCase.addEvent(
                     patrolId = patrolId,
