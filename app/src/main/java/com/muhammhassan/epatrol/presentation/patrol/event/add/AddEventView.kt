@@ -206,18 +206,20 @@ fun AddEventView(
             Spacer(modifier = Modifier.weight(1f))
             Card(
                 modifier = Modifier
-                    .padding(12.dp)
                     .fillMaxWidth(), shape = RoundedCornerShape(
                     topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
-                )
+                ),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Button(
-                    onClick = onSubmit,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    Text(text = "Tambah Kejadian", style = TextStyle(fontSize = 16.sp))
+                Box(modifier = Modifier.padding(24.dp)){
+                    Button(
+                        onClick = onSubmit,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Secondary),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        Text(text = "Tambah Kejadian", style = TextStyle(fontSize = 16.sp))
+                    }
                 }
             }
         }
