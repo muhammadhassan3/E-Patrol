@@ -50,4 +50,7 @@ interface ApiInterface {
         @Part("lat") latitude: RequestBody,
         @Part("long") longitude: RequestBody
     ): Response<BaseResponse<Nothing>>
+
+    @PUT("patrol/{id}/finish")
+    suspend fun markAsDonePatrol(@Path("id") id: Long): Response<BaseResponse<Nothing>>
 }
