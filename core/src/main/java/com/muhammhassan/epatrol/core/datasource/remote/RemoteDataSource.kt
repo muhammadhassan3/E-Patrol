@@ -27,4 +27,8 @@ interface RemoteDataSource {
         lat: Double,
         long: Double
     ): Flow<ApiResponse<Nothing>>
+
+    suspend fun markAsDonePatrol(
+        patrolId: Long
+    ): Flow<ApiResponse<Nothing>>
 }

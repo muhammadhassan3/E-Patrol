@@ -31,28 +31,23 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
             }
         }.catch { error ->
             Timber.e(error)
-            error.message?.let {
-                emit(ApiResponse.Error(it))
-            }
+            emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
         }
 
-    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>> =
-        flow {
-            emit(ApiResponse.Loading)
-            val response = api.getPatrolTask()
-            if (response.isSuccessful) {
-                response.body()?.data?.let {
-                    emit(ApiResponse.Success(it))
-                }
-            } else {
-                emit(ApiResponse.Error(response.parseError()))
+    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>> = flow {
+        emit(ApiResponse.Loading)
+        val response = api.getPatrolTask()
+        if (response.isSuccessful) {
+            response.body()?.data?.let {
+                emit(ApiResponse.Success(it))
             }
-        }.catch { error ->
-            Timber.e(error)
-            error.message?.let {
-                emit(ApiResponse.Error(it))
-            }
+        } else {
+            emit(ApiResponse.Error(response.parseError()))
         }
+    }.catch { error ->
+        Timber.e(error)
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+    }
 
     override suspend fun verifyPatrol(id: Long): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
@@ -64,10 +59,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         }
     }.catch {
         Timber.e(it)
-
-        it.message?.let { message ->
-            emit(ApiResponse.Error(message))
-        }
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
 
     override suspend fun getPatrolDetail(id: Long): Flow<ApiResponse<PatrolDetailResponse>> = flow {
@@ -80,14 +72,11 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         }
     }.catch {
         Timber.e(it)
-        it.message?.let { message ->
-            emit(ApiResponse.Error(message))
-        }
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
 
     override suspend fun deletePatrolEvent(
-        patrolId: Long,
-        eventId: Long
+        patrolId: Long, eventId: Long
     ): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
         val response = api.deleteEvent(patrolId, eventId)
@@ -98,9 +87,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         }
     }.catch {
         Timber.e(it)
-        it.message?.let { message ->
-            emit(ApiResponse.Error(message))
-        }
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
 
     override suspend fun addPatrolEvent(
@@ -120,9 +107,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val longitudePart = long.toString().toRequestBody("text/plain".toMediaType())
         val imageFile = image.asRequestBody("image/jpeg".toMediaType())
         val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
-            "photo",
-            image.name,
-            imageFile
+            "photo", image.name, imageFile
         )
         val response = api.addEvent(
             patrolId = patrolId,
@@ -140,8 +125,25 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         }
     }.catch {
         Timber.e(it)
-        it.message?.let { message ->
-            emit(ApiResponse.Error(message = message))
+        emit(ApiResponse.Error(message = NETWORK_FAILURE_MESSAGE))
+    }
+
+    override suspend fun markAsDonePatrol(patrolId: Long): Flow<ApiResponse<Nothing>> = flow {
+        emit(ApiResponse.Loading)
+        val response = api.markAsDonePatrol(patrolId)
+        if(response.isSuccessful){
+            emit(ApiResponse.Success(null))
+        }else{
+            emit(ApiResponse.Error(response.parseError()))
         }
+    }.catch {
+        Timber.e(it)
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+    }
+
+
+    companion object {
+        private const val NETWORK_FAILURE_MESSAGE =
+            "Gagal terhubung ke jaringan, silahkan periksa jaringan yang kamu gunakan"
     }
 }

@@ -24,4 +24,6 @@ interface TaskRepository {
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<Nothing>>
+
+    suspend fun markAsDone(patrolId: Long): Flow<ApiResponse<Nothing>>
 }

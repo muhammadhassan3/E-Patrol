@@ -45,4 +45,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
             longitude
         )
     }
+
+    override suspend fun markAsDone(patrolId: Long): Flow<ApiResponse<Nothing>> {
+        return remoteDataSource.markAsDonePatrol(patrolId)
+    }
 }
