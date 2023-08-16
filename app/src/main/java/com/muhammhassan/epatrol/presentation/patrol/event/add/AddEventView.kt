@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -26,8 +27,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil.compose.AsyncImage
+import com.muhammhassan.epatrol.component.LoadingDialog
+import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Secondary
 import compose.icons.Octicons
@@ -61,8 +68,57 @@ fun AddEventView(
     action: String,
     actionChanged: (value: String) -> Unit,
     onSubmit: () -> Unit,
+    addState: UiState<Nothing>?,
+    onResponseSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isLoading = remember{
+        mutableStateOf(false)
+    }
+
+    val isDialogShow = remember{
+        mutableStateOf(false)
+    }
+
+    val dialogMessage = remember{
+        mutableStateOf("")
+    }
+    
+    if(isLoading.value){
+        LoadingDialog(onDismiss = { isLoading.value = false })
+    }
+    
+    if(isDialogShow.value){
+        AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
+            TextButton(onClick = { isDialogShow.value = false }) {
+                Text(text = "Oke")
+            }
+        }, title = {
+            Text(text = "Pemberitahuan")
+        }, text = {
+            Text(text = dialogMessage.value)
+        })
+    }
+
+    LaunchedEffect(key1 = addState, block ={
+        when(addState){
+            is UiState.Error -> {
+                isLoading.value = false
+                dialogMessage.value = addState.message
+                isDialogShow.value = true
+            }
+            UiState.Loading -> {
+                isLoading.value = true
+            }
+            is UiState.Success -> {
+                isLoading.value = false
+                onResponseSuccess.invoke()
+            }
+            null -> {}
+        }
+    } )
+
+
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
@@ -239,6 +295,8 @@ fun AddEventPreview() {
             actionChanged = {},
             summary = "",
             summaryChanged = {},
-            onSubmit = {})
+            onSubmit = {},
+            addState = null,
+            onResponseSuccess = {})
     }
 }
