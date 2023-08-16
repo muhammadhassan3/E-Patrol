@@ -98,8 +98,8 @@ class AddEventActivity : ComponentActivity() {
             val event by viewModel.event.collectAsStateWithLifecycle()
             val summary by viewModel.summary.collectAsStateWithLifecycle()
             val action by viewModel.action.collectAsStateWithLifecycle()
-            AddEventView(
-                onNavUp = { finish() },
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            AddEventView(onNavUp = { finish() },
                 onCaptureImage = { openIntentCamera() },
                 image = image,
                 event = event,
@@ -110,11 +110,19 @@ class AddEventActivity : ComponentActivity() {
                 actionChanged = viewModel::setAction,
                 onSubmit = {
                     viewModel.save(this@AddEventActivity)
-                })
+                },
+                addState = state,
+                onResponseSuccess = { navigateBack() })
         }
 
         initLocation()
         startLocationUpdate()
+    }
+
+    private fun navigateBack() {
+        setResult(RESULT_OK)
+        Toast.makeText(this, "Kejadian berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun openIntentCamera() {
@@ -123,9 +131,7 @@ class AddEventActivity : ComponentActivity() {
 
         createCustomTempFile(applicationContext).also {
             val photoUri = FileProvider.getUriForFile(
-                this,
-                "com.muhammhassan.epatrol",
-                it
+                this, "com.muhammhassan.epatrol", it
             )
 
             currentPath = it.absolutePath
@@ -140,12 +146,10 @@ class AddEventActivity : ComponentActivity() {
             LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.SECONDS.toMillis(2))
                 .build()
 
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val client = LocationServices.getSettingsClient(this)
 
-        client.checkLocationSettings(builder.build())
-            .addOnSuccessListener {
+        client.checkLocationSettings(builder.build()).addOnSuccessListener {
 
             }.addOnFailureListener {
                 if (it is ResolvableApiException) {
@@ -165,11 +169,9 @@ class AddEventActivity : ComponentActivity() {
 
     private fun startLocationUpdate() {
         if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocation?.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
@@ -191,8 +193,7 @@ class AddEventActivity : ComponentActivity() {
     companion object {
         const val patrolId = "patrol_id"
         private val REQUIRED_LOCATION_PERMISSION = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
         )
     }
 }

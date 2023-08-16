@@ -20,6 +20,7 @@ class EventDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val patrolId = intent.getLongExtra(patrolId, 0L)
+        val removable = intent.getBooleanExtra(removable, false)
         val event = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(eventData, PatrolEventModel::class.java)
         } else {
@@ -40,7 +41,8 @@ class EventDetailActivity : ComponentActivity() {
                         onDeleteAction = viewModel::deleteEvent,
                         email = email,
                         deleteState = deleteState,
-                        onResponseSuccess = ::responseSuccess
+                        onResponseSuccess = ::responseSuccess,
+                        removable =removable
                     )
                 }
             }
@@ -56,5 +58,6 @@ class EventDetailActivity : ComponentActivity() {
     companion object {
         const val patrolId = "patrol_id"
         const val eventData = "event_data"
+        const val removable = "removable"
     }
 }

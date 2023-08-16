@@ -52,9 +52,10 @@ class PatrolDetailActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    private fun navigateToDetailEvent(data: PatrolEventModel) {
+    private fun navigateToDetailEvent(data: PatrolEventModel, removable: Boolean) {
         val intent = Intent(this, EventDetailActivity::class.java)
         intent.putExtra(EventDetailActivity.patrolId, viewModel.patrolId)
+        intent.putExtra(EventDetailActivity.removable, removable)
         intent.putExtra(EventDetailActivity.eventData, data)
         startActivity(intent)
     }

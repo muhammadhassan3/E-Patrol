@@ -48,6 +48,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.muhammhassan.epatrol.component.ConfirmDialogView
+import com.muhammhassan.epatrol.component.LoadingDialog
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
@@ -69,6 +70,7 @@ fun EventDetailView(
     onResponseSuccess: () -> Unit,
     onDeleteAction: (eventId: Long) -> Unit,
     email: String,
+    removable: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -111,26 +113,30 @@ fun EventDetailView(
 
     if (isConfirmDialogShow.value) {
         Dialog(onDismissRequest = { isConfirmDialogShow.value = false }) {
-            ConfirmDialogView(
-                message = "Apakah kamu yakin ingin menghapus kejadian ini dari laporan?",
+            ConfirmDialogView(message = "Apakah kamu yakin ingin menghapus kejadian ini dari laporan?",
                 onDismiss = { isConfirmDialogShow.value = false },
-                onConfirm = { onDeleteAction.invoke(data.id) })
+                onConfirm = {
+                    isConfirmDialogShow.value = false
+                    onDeleteAction.invoke(data.id)
+                })
         }
     }
 
-    if(isErrorDialogShow.value){
+    if (isErrorDialogShow.value) {
         Timber.e("Dialog recomposed")
-        AlertDialog(
-            onDismissRequest = { isErrorDialogShow.value = false },
-            confirmButton = { 
-                TextButton(onClick = { isErrorDialogShow.value = false }) {
-                    Text(text = "Oke")
-                }
-            }, text = {
-                Text(text = errorMessage.value)
-            }, title = {
-                Text(text = "Pemberitahuan")
-            })
+        AlertDialog(onDismissRequest = { isErrorDialogShow.value = false }, confirmButton = {
+            TextButton(onClick = { isErrorDialogShow.value = false }) {
+                Text(text = "Oke")
+            }
+        }, text = {
+            Text(text = errorMessage.value)
+        }, title = {
+            Text(text = "Pemberitahuan")
+        })
+    }
+
+    if (isLoading.value) {
+        LoadingDialog(onDismiss = { isLoading.value = false })
     }
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
@@ -154,9 +160,9 @@ fun EventDetailView(
                 .fillMaxSize()
                 .verticalScroll(state = scrollState)
         ) {
-            SubcomposeAsyncImage(model = ImageRequest.Builder(LocalContext.current).data(data.image)
-                .crossfade(true).diskCacheKey(data.image).diskCachePolicy(CachePolicy.ENABLED)
-                .build(),
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(data.image).crossfade(true)
+                    .diskCacheKey(data.image).diskCachePolicy(CachePolicy.ENABLED).build(),
                 contentDescription = "Gambar kejadian",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,7 +181,8 @@ fun EventDetailView(
                             .align(Alignment.Center)
                             .size(55.dp), color = Primary
                     )
-                }, contentScale = ContentScale.Crop
+                },
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(8.dp))
             Card(
@@ -236,7 +243,7 @@ fun EventDetailView(
                     )
                 }
             }
-            if (email == data.author) {
+            if (email == data.author && removable) {
                 Spacer(modifier = Modifier.weight(1f))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -287,6 +294,8 @@ fun EventDetailPreview() {
             onNavUp = {},
             onDeleteAction = {},
             deleteState = UiState.Loading,
-            onResponseSuccess = {})
+            onResponseSuccess = {},
+            removable = true
+        )
     }
 }
