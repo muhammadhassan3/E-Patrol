@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -59,13 +60,13 @@ import com.muhammhassan.epatrol.domain.model.PatrolDetailModel
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
-import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Secondary
+import com.muhammhassan.epatrol.utils.PatrolStatus
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
+import compose.icons.octicons.ArrowRight24
 import compose.icons.octicons.Calendar24
-import compose.icons.octicons.CircleSlash24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.Plus24
 
@@ -75,7 +76,7 @@ fun PatrolDetailView(
     onNavUp: () -> Unit,
     userEmail: String,
     navigateToAddEvent: (id: Long) -> Unit,
-    navigateToDetailEvent: (id: PatrolEventModel) -> Unit,
+    navigateToDetailEvent: (id: PatrolEventModel, removable: Boolean) -> Unit,
     state: UiState<PatrolDetailModel>,
     confirmState: UiState<Nothing>?,
     markAsDonePatrol: (patrolId: Long) -> Unit,
@@ -185,16 +186,18 @@ fun PatrolDetailView(
                 )
             }
         }, actions = {
-            PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
-                IconButton(
-                    onClick = { navigateToAddEvent(data.id) }, modifier = Modifier.tooltipAnchor()
-                ) {
-                    Icon(
-                        painter = rememberVectorPainter(image = Octicons.Plus24),
-                        contentDescription = "Tambah"
-                    )
+            if (data.status == PatrolStatus.SEDANG_DIJALANKAN)
+                PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
+                    IconButton(
+                        onClick = { navigateToAddEvent(data.id) },
+                        modifier = Modifier.tooltipAnchor()
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(image = Octicons.Plus24),
+                            contentDescription = "Tambah"
+                        )
+                    }
                 }
-            }
         })
     }) { padding ->
         Column(
@@ -226,13 +229,15 @@ fun PatrolDetailView(
                     Row(modifier = Modifier.padding(16.dp)) {
                         ExpandableCard(title = "Daftar Kejadian", content = {
                             data.events.forEach {
-                                EventItem(data = it, onItemClick = navigateToDetailEvent)
+                                EventItem(data = it, onItemClick = {item ->
+                                    navigateToDetailEvent.invoke(item, userEmail == data.lead && data.status == PatrolStatus.SEDANG_DIJALANKAN)
+                                })
                             }
                         }, defaultExpandedValue = true)
                     }
                 }
             }
-            if (userEmail == data.lead) {
+            if (userEmail == data.lead && data.status == PatrolStatus.SEDANG_DIJALANKAN) {
                 Card(
                     modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(
                         topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
@@ -251,16 +256,26 @@ fun PatrolDetailView(
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     text = "Selesaikan patroli",
-                                    style = TextStyle(fontSize = 16.sp, color = Red)
+                                    style = TextStyle(fontSize = 16.sp, color = Color.White)
                                 )
-                                Icon(
-                                    painter = rememberVectorPainter(image = Octicons.CircleSlash24),
-                                    contentDescription = "Icon Selesaikan"
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(Color.White)
+                                        .padding(4.dp)
+                                ) {
+                                    Icon(
+                                        painter = rememberVectorPainter(image = Octicons.ArrowRight24),
+                                        contentDescription = "Icon Selesaikan",
+                                        modifier = Modifier.size(16.dp),
+                                        tint = Secondary
+                                    )
+                                }
                             }
                         }
                     }
@@ -419,7 +434,7 @@ fun PatrolDetailPreview() {
             onNavUp = {},
             userEmail = "budi@gmail.com",
             navigateToAddEvent = {},
-            navigateToDetailEvent = {},
+            navigateToDetailEvent = {_,_ ->},
             confirmState = null,
             markAsDonePatrol = {},
             onCompleteSuccess = {})
