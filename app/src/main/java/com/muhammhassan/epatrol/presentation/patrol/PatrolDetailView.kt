@@ -60,12 +60,12 @@ import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Red
-import com.muhammhassan.epatrol.ui.theme.Red20
 import com.muhammhassan.epatrol.ui.theme.Secondary
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Calendar24
+import compose.icons.octicons.CircleSlash24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.Plus24
 
@@ -169,7 +169,10 @@ fun PatrolDetailView(
             ConfirmDialogView(
                 message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
                 onDismiss = { isConfirmDialogShow.value = false },
-                onConfirm = { markAsDonePatrol.invoke(data.id) })
+                onConfirm = {
+                    isConfirmDialogShow.value = false
+                    markAsDonePatrol.invoke(data.id)
+                })
         }
     }
 
@@ -243,13 +246,22 @@ fun PatrolDetailView(
                         Button(
                             onClick = { isConfirmDialogShow.value = true },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Red20),
-                            contentPadding = PaddingValues(16.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = Secondary),
+                            contentPadding = PaddingValues(16.dp),
                         ) {
-                            Text(
-                                text = "Tambah Kejadian",
-                                style = TextStyle(fontSize = 16.sp, color = Red)
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Selesaikan patroli",
+                                    style = TextStyle(fontSize = 16.sp, color = Red)
+                                )
+                                Icon(
+                                    painter = rememberVectorPainter(image = Octicons.CircleSlash24),
+                                    contentDescription = "Icon Selesaikan"
+                                )
+                            }
                         }
                     }
                 }
