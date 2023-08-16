@@ -8,11 +8,17 @@ import com.muhammhassan.epatrol.domain.utils.Mapper.mapToUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LoginInteractor(private val user: UserRepository): LoginUseCase {
+class LoginInteractor(private val user: UserRepository) : LoginUseCase {
     override suspend fun login(email: String, password: String): Flow<UiState<UserModel>> {
         return user.login(email, password).map {
             it.mapToUiState { message ->
-                UserModel(message.user.name!!, "", message.user.email!!)
+                UserModel(
+                    message.user.name!!,
+                    message.user.profile!!,
+                    message.user.email!!,
+                    message.user.jabatan!!,
+                    message.user.nrp!!
+                )
             }
         }
     }

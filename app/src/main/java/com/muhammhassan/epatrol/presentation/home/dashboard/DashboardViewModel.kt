@@ -19,7 +19,7 @@ class DashboardViewModel(private val useCase: DashboardUseCase): ViewModel()
     private val _verifyState = MutableStateFlow<UiState<Nothing>?>(null)
     val verifyState = _verifyState.asStateFlow()
 
-    private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "",""))
+    private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "","", "", ""))
     val user = _user.asStateFlow()
 
     init{

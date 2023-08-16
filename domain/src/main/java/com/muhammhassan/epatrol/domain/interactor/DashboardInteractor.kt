@@ -14,7 +14,7 @@ class DashboardInteractor(private val user: UserRepository, private val task: Ta
     DashboardUseCase {
     override fun getUser(): Flow<UserModel> {
         return user.getUser().map {
-            UserModel(it.name!!, "", it.email!!)
+            UserModel(it.name!!, it.profile!!, it.email!!,it.jabatan!!, it.nrp!!)
         }
     }
 

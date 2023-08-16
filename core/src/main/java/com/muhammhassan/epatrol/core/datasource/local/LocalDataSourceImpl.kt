@@ -4,9 +4,11 @@ import com.muhammhassan.epatrol.core.datasource.local.datastore.DataStorePrefere
 import com.muhammhassan.epatrol.core.model.UserModel
 import kotlinx.coroutines.flow.Flow
 
-class LocalDataSourceImpl(private val datastore: DataStorePreferences): LocalDataSource {
-    override suspend fun setUser(email: String, nrp: String, nama: String) {
-        datastore.setUser(email, nrp, nama)
+class LocalDataSourceImpl(private val datastore: DataStorePreferences) : LocalDataSource {
+    override suspend fun setUser(
+        email: String, nrp: String, nama: String, jabatan: String, profileUrl: String
+    ) {
+        datastore.setUser(email, nrp, nama, jabatan, profileUrl)
     }
 
     override fun getSavedUser(): Flow<UserModel> {
@@ -23,5 +25,9 @@ class LocalDataSourceImpl(private val datastore: DataStorePreferences): LocalDat
 
     override fun getEmail(): Flow<String?> {
         return datastore.getEmail()
+    }
+
+    override suspend fun clearLocal() {
+        datastore.clear()
     }
 }

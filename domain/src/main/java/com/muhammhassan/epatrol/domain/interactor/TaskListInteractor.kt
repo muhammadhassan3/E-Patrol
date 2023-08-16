@@ -10,7 +10,8 @@ import com.muhammhassan.epatrol.domain.utils.Mapper.mapToUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class TaskListInteractor(private val task: TaskRepository, private val user: UserRepository): TaskListUseCase {
+class TaskListInteractor(private val task: TaskRepository, private val user: UserRepository) :
+    TaskListUseCase {
     override suspend fun getTaskList(): Flow<UiState<List<PatrolModel>>> {
         return task.getTaskList().map { response ->
             response.mapToUiState { list ->
@@ -33,7 +34,7 @@ class TaskListInteractor(private val task: TaskRepository, private val user: Use
 
     override fun getUser(): Flow<UserModel> {
         return user.getUser().map {
-            UserModel(it.name!!, "", it.email!!)
+            UserModel(it.name!!, it.profile!!, it.email!!, it.jabatan!!, it.nrp!!)
         }
     }
 

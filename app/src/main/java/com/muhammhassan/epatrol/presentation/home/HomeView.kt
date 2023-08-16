@@ -87,14 +87,19 @@ fun HomeView(
             Screen.Task.route -> {
                 CenterAlignedTopAppBar(title = {
                     Text(
-                        text = "Daftar Tugas Patroli",
+                        text = "Tugas Patroli",
                         style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     )
                 })
             }
 
             Screen.Profile.route -> {
-
+                CenterAlignedTopAppBar(title = {
+                    Text(
+                        text = "Profil",
+                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    )
+                })
             }
         }
     }) { padding ->

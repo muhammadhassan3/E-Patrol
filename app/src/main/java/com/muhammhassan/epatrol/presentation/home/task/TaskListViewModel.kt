@@ -15,7 +15,7 @@ class TaskListViewModel(private val useCase: TaskListUseCase): ViewModel() {
     private val _taskList = MutableStateFlow<UiState<List<PatrolModel>>>(UiState.Loading)
     val taskList = _taskList.asStateFlow()
 
-    private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "",""))
+    private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "","", "", ""))
     val user = _user.asStateFlow()
 
     private val _verifyState = MutableStateFlow<UiState<Nothing>?>(null)

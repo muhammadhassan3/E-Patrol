@@ -12,7 +12,7 @@ class UserRepositoryImpl(private val remote: RemoteDataSource, private val local
     override suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>> {
         return remote.login(email, password).map {
             if(it is ApiResponse.Success && it.data != null){
-                local.setUser(email = it.data.user.email!!, nrp = it.data.user.nrp!!, nama = it.data.user.name!!)
+                local.setUser(email = it.data.user.email!!, nrp = it.data.user.nrp!!, nama = it.data.user.name!!, jabatan = it.data.user.jabatan!!, profileUrl = it.data.user.profile!!)
             }
             it
         }
@@ -24,5 +24,9 @@ class UserRepositoryImpl(private val remote: RemoteDataSource, private val local
 
     override fun getEmail(): Flow<String?> {
         return local.getEmail()
+    }
+
+    override suspend fun clear() {
+        local.clearLocal()
     }
 }

@@ -10,4 +10,6 @@ interface UserRepository {
 
     fun getUser(): Flow<UserModel>
     fun getEmail(): Flow<String?>
+
+    suspend fun clear()
 }

@@ -12,15 +12,17 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
 
     fun getUser(): Flow<UserModel> {
         return datastore.data.map {
-            UserModel(it[NAME], it[EMAIL], it[NRP])
+            UserModel(it[NAME], it[EMAIL], it[NRP], it[JABATAN], it[PROFILE])
         }
     }
 
-    suspend fun setUser(email: String, nrp: String, name: String){
+    suspend fun setUser(email: String, nrp: String, name: String, jabatan: String, profileImage: String){
         datastore.edit {
             it[EMAIL] = email
             it[NAME] = name
             it[NRP] = nrp
+            it[JABATAN] = jabatan
+            it[PROFILE] = profileImage
         }
     }
 
@@ -42,10 +44,18 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
         }
     }
 
+    suspend fun clear(){
+        datastore.edit {
+            it.clear()
+        }
+    }
+
     companion object{
         val EMAIL = stringPreferencesKey("email")
         val NAME = stringPreferencesKey("name")
         val NRP = stringPreferencesKey("nrp")
+        val JABATAN = stringPreferencesKey("jabatan")
+        val PROFILE = stringPreferencesKey("profile")
         val TOKEN = stringPreferencesKey("token")
     }
 }

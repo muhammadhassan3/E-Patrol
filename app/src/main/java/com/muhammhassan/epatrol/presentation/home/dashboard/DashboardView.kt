@@ -322,7 +322,7 @@ fun DashboardPreview() {
                 )
             )
         ),
-            user = UserModel("Doni Salamander", "", ""),
+            user = UserModel("Doni Salamander", "", "","", ""),
             onProfileClicked = {},
             navigateToDetailPage = {},
             onNotificationClicked = {},
