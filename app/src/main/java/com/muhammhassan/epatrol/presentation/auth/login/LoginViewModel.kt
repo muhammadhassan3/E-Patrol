@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val useCase: LoginUseCase): ViewModel() {
+class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
 
@@ -21,29 +21,29 @@ class LoginViewModel(private val useCase: LoginUseCase): ViewModel() {
     private val _state = MutableStateFlow<UiState<UserModel>?>(null)
     val state = _state.asStateFlow()
 
-    init{
+    init {
         viewModelScope.launch {
             val email = useCase.getSavedEmail().firstOrNull()
             _email.value = email ?: ""
         }
     }
 
-    fun setEmail(value: String){
+    fun setEmail(value: String) {
         _email.value = value
     }
 
-    fun setPassword(value: String){
+    fun setPassword(value: String) {
         _password.value = value
     }
 
-    fun login(){
-        if(!PatternsCompat.EMAIL_ADDRESS.matcher(email.value).matches()){
+    fun login() {
+        if (!PatternsCompat.EMAIL_ADDRESS.matcher(email.value).matches()) {
             _state.value = UiState.Error("Silahkan masukkan email yang valid")
             return
         }
 
         viewModelScope.launch {
-            useCase.login(email.value, password.value).collect{
+            useCase.login(email.value, password.value).collect {
                 _state.value = it
             }
         }
