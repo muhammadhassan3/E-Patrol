@@ -32,6 +32,8 @@ import com.muhammhassan.epatrol.ui.theme.Orange
 import com.muhammhassan.epatrol.ui.theme.Orange20
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
+import com.muhammhassan.epatrol.utils.PatrolStatus.BELUM_DIJALANKAN
+import com.muhammhassan.epatrol.utils.PatrolStatus.SEDANG_DIJALANKAN
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.Calendar24
@@ -53,7 +55,7 @@ fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Uni
         ) {
             val (status, iconDate, date, iconHour, hour, title, targetAddress, menu) = createRefs()
             when (model.status) {
-                "belum-dikerjakan" -> {
+                BELUM_DIJALANKAN -> {
                     Text(getDisplayStatus(model.status),
                         modifier = Modifier
                             .constrainAs(status) {
@@ -65,7 +67,7 @@ fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Uni
                             .padding(12.dp, 2.dp),
                         color = Red)
                 }
-                "sedang-dikerjakan" -> {
+                SEDANG_DIJALANKAN -> {
                     Text(getDisplayStatus(model.status),
                         modifier = Modifier
                             .constrainAs(status) {
