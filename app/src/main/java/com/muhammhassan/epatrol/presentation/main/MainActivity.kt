@@ -1,6 +1,8 @@
 package com.muhammhassan.epatrol.presentation.main
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.presentation.auth.AuthActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -20,6 +23,7 @@ class MainActivity : ComponentActivity() {
             if (it) {
                 navigate()
             } else {
+                navigate()
                 Toast.makeText(
                     this,
                     "Silahkan aktifkan perizinan notifikasi pada halaman pengaturan",
@@ -34,7 +38,7 @@ class MainActivity : ComponentActivity() {
             true
         }
         super.onCreate(savedInstanceState)
-
+        initiateNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -45,8 +49,26 @@ class MainActivity : ComponentActivity() {
             } else {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-        }else{
+        } else {
             navigate()
+        }
+    }
+
+    private fun initiateNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = resources.getString(R.string.channel_id)
+            val channelName = resources.getString(R.string.channel_name)
+            val channelDesc = resources.getString(R.string.channel_desc)
+            val channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).also {
+                it.description = channelDesc
+            }
+
+            val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(channel)
         }
     }
 
