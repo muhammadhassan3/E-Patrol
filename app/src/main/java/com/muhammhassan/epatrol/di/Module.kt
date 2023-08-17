@@ -2,6 +2,7 @@ package com.muhammhassan.epatrol.di
 
 import com.muhammhassan.epatrol.presentation.auth.login.LoginViewModel
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardViewModel
+import com.muhammhassan.epatrol.presentation.home.profile.ProfileViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListViewModel
 import com.muhammhassan.epatrol.presentation.patrol.PatrolDetailViewModel
 import com.muhammhassan.epatrol.presentation.patrol.event.EventDetailViewModel
@@ -17,5 +18,6 @@ object Module {
         viewModel { PatrolDetailViewModel(get()) }
         viewModel { EventDetailViewModel(get()) }
         viewModel { AddEventViewModel(get()) }
+        viewModel { ProfileViewModel(get()) }
     }
 }
