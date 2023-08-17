@@ -1,7 +1,9 @@
 package com.muhammhassan.epatrol.presentation.home.dashboard
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,8 +15,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +31,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -55,6 +58,7 @@ import compose.icons.Octicons
 import compose.icons.octicons.Bell24
 import compose.icons.octicons.Person24
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class
@@ -72,7 +76,8 @@ fun DashboardView(
     modifier: Modifier = Modifier
 ) {
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true,
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
         confirmValueChange = { it != SheetValue.Expanded })
     val scope = rememberCoroutineScope()
     val isSheetShow = remember {
@@ -211,36 +216,33 @@ fun DashboardView(
         }) {
             Icon(imageVector = Octicons.Bell24, contentDescription = "Show Notification")
         }
-
-        if (user.profileImage != "") {
-            Button(
-                onClick = onProfileClicked,
-                modifier = Modifier.constrainAs(profile) {
+        Box(
+            modifier = Modifier
+                .constrainAs(profile) {
                     top.linkTo(parent.top, 16.dp)
                     end.linkTo(parent.end, 16.dp)
                     width = Dimension.value(35.dp)
                     height = Dimension.value(35.dp)
+                }
+                .clip(CircleShape)
+                .background(Color.White),
+        ) {
+            SubcomposeAsyncImage(model = ImageRequest.Builder(LocalContext.current)
+                .data(user.profileImage).diskCacheKey(user.profileImage)
+                .diskCachePolicy(CachePolicy.ENABLED).build(),
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
+                loading = {
+                    Timber.i("Image Loading")
+                    CircularProgressIndicator()
                 },
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(user.profileImage)
-                        .crossfade(true).diskCacheKey(user.profileImage)
-                        .diskCachePolicy(CachePolicy.ENABLED).build(),
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Crop
-                )
-            }
-        } else {
-            IconButton(onClick = onProfileClicked, modifier = Modifier.constrainAs(profile) {
-                top.linkTo(parent.top, 16.dp)
-                end.linkTo(parent.end, 16.dp)
-                width = Dimension.value(35.dp)
-                height = Dimension.value(35.dp)
-            }) {
-                Icon(imageVector = Octicons.Person24, contentDescription = "Profile")
-            }
+                error = {
+                    Timber.e(it.result.throwable)
+                    Icon(
+                        painter = rememberVectorPainter(image = Octicons.Person24),
+                        contentDescription = "Icon profile"
+                    )
+                })
         }
         Text(
             text = "Tugas Patroli", modifier = Modifier.constrainAs(title) {
@@ -322,7 +324,7 @@ fun DashboardPreview() {
                 )
             )
         ),
-            user = UserModel("Doni Salamander", "", "","", ""),
+            user = UserModel("Doni Salamander", "", "", "", ""),
             onProfileClicked = {},
             navigateToDetailPage = {},
             onNotificationClicked = {},
