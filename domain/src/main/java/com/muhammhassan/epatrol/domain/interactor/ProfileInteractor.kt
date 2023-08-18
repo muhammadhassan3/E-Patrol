@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ProfileInteractor(private val user: UserRepository) : ProfileUseCase {
-    override suspend fun getUser(): Flow<UserModel> {
+    override fun getUser(): Flow<UserModel> {
         return user.getUser().map {
             UserModel(
                 it.name ?: "",
@@ -17,5 +17,9 @@ class ProfileInteractor(private val user: UserRepository) : ProfileUseCase {
                 it.nrp ?: ""
             )
         }
+    }
+
+    override suspend fun logout() {
+        user.clear()
     }
 }
