@@ -23,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,6 +60,7 @@ import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.CrossReference24
+import compose.icons.octicons.Location24
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +73,7 @@ fun EventDetailView(
     onDeleteAction: (eventId: Long) -> Unit,
     email: String,
     removable: Boolean,
+    showLocationOnMap: (lat: Double, long: Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -151,6 +154,17 @@ fun EventDetailView(
                     painter = rememberVectorPainter(image = Octicons.ArrowLeft24),
                     contentDescription = "Kembali"
                 )
+            }
+        }, actions = {
+            PlainTooltipBox(tooltip = { Text(text = "Lihat lokasi") }) {
+                IconButton(onClick = {
+                    showLocationOnMap.invoke(data.lat, data.long)
+                }, modifier = Modifier.tooltipAnchor()) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Octicons.Location24),
+                        contentDescription = "Lihat Location"
+                    )
+                }
             }
         })
     }) {
@@ -295,7 +309,7 @@ fun EventDetailPreview() {
             onDeleteAction = {},
             deleteState = UiState.Loading,
             onResponseSuccess = {},
-            removable = true
-        )
+            removable = true,
+            showLocationOnMap = { _, _ -> })
     }
 }
