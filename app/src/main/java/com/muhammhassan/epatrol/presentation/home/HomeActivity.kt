@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.muhammhassan.epatrol.presentation.auth.AuthActivity
 import com.muhammhassan.epatrol.presentation.patrol.PatrolDetailActivity
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 
@@ -23,7 +24,7 @@ class HomeActivity : ComponentActivity() {
                 ) {
                     HomeView(navigateToDetailPage = {
                         navigateToDetailPatrol(it)
-                    })
+                    }, onReset = ::navigateToLogin)
                 }
             }
         }
@@ -32,6 +33,12 @@ class HomeActivity : ComponentActivity() {
     private fun navigateToDetailPatrol(id: Long) {
         val intent = Intent(this, PatrolDetailActivity::class.java)
         intent.putExtra(PatrolDetailActivity.id, id)
+        startActivity(intent)
+    }
+
+    private fun navigateToLogin(){
+        val intent = Intent(this, AuthActivity::class.java)
+        finishAffinity()
         startActivity(intent)
     }
 }
