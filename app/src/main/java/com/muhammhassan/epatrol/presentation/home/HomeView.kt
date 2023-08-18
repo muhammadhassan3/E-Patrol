@@ -1,6 +1,5 @@
 package com.muhammhassan.epatrol.presentation.home
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
@@ -12,16 +11,15 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,6 +28,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardView
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardViewModel
+import com.muhammhassan.epatrol.presentation.home.profile.ProfileView
+import com.muhammhassan.epatrol.presentation.home.profile.ProfileViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListView
 import com.muhammhassan.epatrol.presentation.home.task.TaskListViewModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
@@ -46,6 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeView(
     navigateToDetailPage: (id: Long) -> Unit,
+    onReset: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -115,7 +116,8 @@ fun HomeView(
                 val state by viewModel.taskList.collectAsState()
                 val user by viewModel.user.collectAsState()
                 val verifyState by viewModel.verifyState.collectAsState()
-                DashboardView(uiState = state,
+                DashboardView(
+                    uiState = state,
                     user = user,
                     onProfileClicked = { /*TODO*/ },
                     onNotificationClicked = { /*TODO*/ },
@@ -140,18 +142,20 @@ fun HomeView(
                     onRefreshTriggered = viewModel::getTask,
                     verifyState = verifyState,
                     user = user,
-                    navigateToDetailPage = {},
+                    navigateToDetailPage = navigateToDetailPage,
                     verifyPatrolTask = viewModel::verifyPatrol,
                     modifier = Modifier.fillMaxSize()
                 )
             }
             composable(route = Screen.Profile.route) {
-                val context = LocalContext.current
-                LaunchedEffect(key1 = true, block = {
-                    Toast.makeText(
-                        context, "Halaman ini sedang dalam pembaruan", Toast.LENGTH_SHORT
-                    ).show()
-                })
+                val viewModel = koinViewModel<ProfileViewModel>()
+                val user by viewModel.user.collectAsStateWithLifecycle()
+                user?.let { data ->
+                    ProfileView(user = data, onLogout = {
+                        viewModel.logout()
+                        onReset.invoke()
+                    })
+                }
             }
         }
     }
@@ -161,6 +165,6 @@ fun HomeView(
 @Composable
 fun HomePreview() {
     EPatrolTheme {
-        HomeView(navigateToDetailPage = {})
+        HomeView(navigateToDetailPage = {}, onReset = {})
     }
 }
