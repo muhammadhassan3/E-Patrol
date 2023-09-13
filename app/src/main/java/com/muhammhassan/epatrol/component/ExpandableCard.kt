@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,7 +42,7 @@ import compose.icons.octicons.ChevronRight24
 @Composable
 fun ExpandableCard(
     title: String,
-    content: @Composable (() -> Unit),
+    content: @Composable (ColumnScope.() -> Unit),
     modifier: Modifier = Modifier,
     defaultExpandedValue: Boolean = false,
     containerColor: Color = Color.White,
