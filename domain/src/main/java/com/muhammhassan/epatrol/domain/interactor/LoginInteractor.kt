@@ -13,11 +13,11 @@ class LoginInteractor(private val user: UserRepository) : LoginUseCase {
         return user.login(email, password).map {
             it.mapToUiState { message ->
                 UserModel(
-                    message.user.name!!,
-                    message.user.profile!!,
-                    message.user.email!!,
-                    message.user.jabatan!!,
-                    message.user.nrp!!
+                    message.user.name ?: "",
+                    message.user.profile ?: "",
+                    message.user.email ?: "",
+                    message.user.jabatan ?: "",
+                    message.user.nrp ?: ""
                 )
             }
         }
