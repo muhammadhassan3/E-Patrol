@@ -1,6 +1,7 @@
 package com.muhammhassan.epatrol.domain.usecase
 
 import com.muhammhassan.epatrol.domain.model.UiState
+import com.muhammhassan.epatrol.domain.model.UserModel
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -12,6 +13,9 @@ interface AddEventUseCase {
         action: String,
         image: File,
         lat: Double,
-        long: Double
+        long: Double,
+        authorName:String
     ): Flow<UiState<Nothing>>
+
+    fun getUser(): Flow<UserModel>
 }
