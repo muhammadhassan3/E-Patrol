@@ -41,7 +41,6 @@ class AddEventActivity : ComponentActivity() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
                 for (location in p0.locations) {
-                    Timber.i("Location Updated : ${location.latitude}/${location.longitude}")
                     viewModel.latitude = location.latitude
                     viewModel.longitude = location.longitude
                 }
