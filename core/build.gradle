@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://epatrol-mock-server.vercel.app/"'
+            buildConfigField "String", "BASE_URL", '"https://simple-rol.protic.web.id/api/"'
         }
         release {
             minifyEnabled false
