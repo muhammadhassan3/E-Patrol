@@ -27,7 +27,6 @@ class EventDetailActivity : ComponentActivity() {
         viewModel.eventId = eventId
         viewModel.getData()
         setContent {
-            val email by viewModel.email.collectAsStateWithLifecycle()
             val deleteState by viewModel.deleteState.collectAsStateWithLifecycle()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             EPatrolTheme {
@@ -39,7 +38,6 @@ class EventDetailActivity : ComponentActivity() {
                         onNavUp = { finish() },
                         uiState = uiState,
                         onDeleteAction = viewModel::deleteEvent,
-                        email = email,
                         deleteState = deleteState,
                         onResponseSuccess = ::responseSuccess,
                         removable = removable,
