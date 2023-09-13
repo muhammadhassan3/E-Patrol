@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +33,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -69,6 +73,7 @@ import compose.icons.octicons.ArrowRight24
 import compose.icons.octicons.Calendar24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.Plus24
+import compose.icons.octicons.Sync24
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,9 +83,11 @@ fun PatrolDetailView(
     navigateToAddEvent: (id: Long) -> Unit,
     navigateToDetailEvent: (id: PatrolEventModel, removable: Boolean) -> Unit,
     state: UiState<PatrolDetailModel>,
+    eventState: UiState<List<PatrolEventModel>>,
     confirmState: UiState<Nothing>?,
     markAsDonePatrol: (patrolId: Long) -> Unit,
     onCompleteSuccess: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (data, setData) = remember {
@@ -93,15 +100,24 @@ fun PatrolDetailView(
                 "2 Juli 2023",
                 "14.20",
                 "Patroli keamanan Malam Hari bertujuan untuk mencegah tindakan kriminal seperti perampokan, pencurian, vandalisme",
-                listOf(),
                 lead = "budi@gmail.com"
             )
         )
     }
 
+    val events = remember {
+        mutableStateListOf<PatrolEventModel>()
+    }
+
+
     val (isLoading, setLoading) = remember {
         mutableStateOf(false)
     }
+
+    val (isEventLoading, setEventLoading) = remember {
+        mutableStateOf(false)
+    }
+
     val (isDialogShow, setDialogShow) = remember {
         mutableStateOf(false)
     }
@@ -128,6 +144,26 @@ fun PatrolDetailView(
             is UiState.Success -> {
                 setLoading(false)
                 state.data?.let { setData(it) }
+            }
+        }
+    })
+
+    LaunchedEffect(key1 = eventState, block = {
+        when (eventState) {
+            is UiState.Error -> {
+                setEventLoading(false)
+                setDialogMessage(eventState.message)
+                setDialogShow(true)
+            }
+
+            UiState.Loading -> {
+                setEventLoading(true)
+            }
+
+            is UiState.Success -> {
+                setEventLoading(false)
+                events.clear()
+                eventState.data?.let { events.addAll(it) }
             }
         }
     })
@@ -167,8 +203,7 @@ fun PatrolDetailView(
 
     if (isConfirmDialogShow.value) {
         Dialog(onDismissRequest = { isConfirmDialogShow.value }) {
-            ConfirmDialogView(
-                message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
+            ConfirmDialogView(message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
                 onDismiss = { isConfirmDialogShow.value = false },
                 onConfirm = {
                     isConfirmDialogShow.value = false
@@ -186,18 +221,26 @@ fun PatrolDetailView(
                 )
             }
         }, actions = {
-            if (data.status == PatrolStatus.SEDANG_DIJALANKAN)
-                PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
-                    IconButton(
-                        onClick = { navigateToAddEvent(data.id) },
-                        modifier = Modifier.tooltipAnchor()
-                    ) {
-                        Icon(
-                            painter = rememberVectorPainter(image = Octicons.Plus24),
-                            contentDescription = "Tambah"
-                        )
-                    }
+            PlainTooltipBox(tooltip = { Text(text = "Muat ulang") }) {
+                IconButton(
+                    onClick = onRefresh, modifier = Modifier.tooltipAnchor()
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Octicons.Sync24),
+                        contentDescription = "Muat ulang"
+                    )
                 }
+            }
+            if (data.status == PatrolStatus.SEDANG_DIJALANKAN) PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
+                IconButton(
+                    onClick = { navigateToAddEvent(data.id) }, modifier = Modifier.tooltipAnchor()
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Octicons.Plus24),
+                        contentDescription = "Tambah"
+                    )
+                }
+            }
         })
     }) { padding ->
         Column(
@@ -226,12 +269,26 @@ fun PatrolDetailView(
                 }
 
                 item {
-                    Row(modifier = Modifier.padding(16.dp)) {
+                    Box(modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()) {
                         ExpandableCard(title = "Daftar Kejadian", content = {
-                            data.events.forEach {
-                                EventItem(data = it, onItemClick = {item ->
-                                    navigateToDetailEvent.invoke(item, userEmail == data.lead && data.status == PatrolStatus.SEDANG_DIJALANKAN)
-                                })
+                            if (isEventLoading) {
+                                CircularProgressIndicator(modifier = Modifier
+                                    .size(45.dp)
+                                    .align(Alignment.CenterHorizontally))
+                            } else if(events.isNotEmpty()){
+                                events.forEach {
+                                    EventItem(data = it, onItemClick = { item ->
+                                        navigateToDetailEvent.invoke(
+                                            item,
+                                            userEmail == data.lead && data.status == PatrolStatus.SEDANG_DIJALANKAN
+                                        )
+                                    })
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            } else {
+                                Text(text = "Data tidak tersedia", modifier = Modifier.align(Alignment.CenterHorizontally))
                             }
                         }, defaultExpandedValue = true)
                     }
@@ -434,9 +491,12 @@ fun PatrolDetailPreview() {
             onNavUp = {},
             userEmail = "budi@gmail.com",
             navigateToAddEvent = {},
-            navigateToDetailEvent = {_,_ ->},
+            navigateToDetailEvent = { _, _ -> },
             confirmState = null,
             markAsDonePatrol = {},
-            onCompleteSuccess = {})
+            onCompleteSuccess = {},
+            onRefresh = {},
+            eventState = UiState.Loading
+        )
     }
 }
