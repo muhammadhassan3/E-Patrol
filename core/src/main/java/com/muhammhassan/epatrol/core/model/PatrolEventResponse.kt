@@ -1,13 +1,22 @@
 package com.muhammhassan.epatrol.core.model
 
+import com.google.gson.annotations.SerializedName
+
 data class PatrolEventResponse(
+    @SerializedName("list data kejadian")
+    val list: List<PatrolEventData>
+)
+
+data class PatrolEventData(
     val id: Long,
-    val image: String,
+    @SerializedName("uraian_kejadian")
     val summary: String,
+    @SerializedName("penemuan_kejadian")
     val title: String,
-    val action: String,
-    val lat: Double,
-    val long: Double,
+    @SerializedName("tgl_kejadian")
     val createdAt: String,
-    val author: String
+    @SerializedName("writer")
+    val author: String,
+    @SerializedName("tindakan")
+    val action: String
 )
