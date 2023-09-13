@@ -111,13 +111,10 @@ fun EventItemPreview() {
         EventItem(
             data = PatrolEventModel(
                 0L,
-                "",
                 "Patroli keamanan Malam Hari bertujuan untuk mencegah tindakan kriminal seperti perampokan, pencurian, vandalisme",
                 "Kecelakaan lalu lintas",
                 "Evakuasi korban",
                 createdAt = "2 Juni 2023 13:24",
-                lat = 0.0,
-                long = 0.0,
                 author = "budi@gmail.com"
             ),
             onItemClick = {}
