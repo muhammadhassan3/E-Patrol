@@ -9,12 +9,14 @@ import com.muhammhassan.epatrol.domain.usecase.AddEventUseCase
 import com.muhammhassan.epatrol.utils.uriToFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
     var patrolId = 0L
     var latitude = 0.0
     var longitude = 0.0
+    private var name = ""
     private val _image = MutableStateFlow<Uri?>(null)
     val image = _image.asStateFlow()
 
@@ -47,11 +49,18 @@ class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
         _image.value = value
     }
 
+    init {
+        getUser()
+    }
+
     fun save(context: Context) {
         viewModelScope.launch {
             if(latitude == 0.0 || longitude == 0.0){
                 _state.value = UiState.Error("Data lokasi tidak ditemukan, silahkan coba beberapa saat lagi")
                 return@launch
+            }
+            if(!arrayOf(action.value.trim(), event.value.trim(), summary.value.trim()).all { it.isNotEmpty() }){
+                _state.value = UiState.Error("Pastikan semua kolom sudah terisi ya")
             }
             if (image.value != null) {
                 useCase.addEvent(
@@ -61,11 +70,19 @@ class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
                     action = action.value,
                     image = uriToFile(image.value!!, context),
                     lat = latitude,
-                    long = longitude
+                    long = longitude,
+                    authorName = name
                 ).collect {
                     _state.value = it
                 }
             }
+        }
+    }
+
+    private fun getUser(){
+        viewModelScope.launch {
+            val user = useCase.getUser().first()
+            name = user.name
         }
     }
 }
