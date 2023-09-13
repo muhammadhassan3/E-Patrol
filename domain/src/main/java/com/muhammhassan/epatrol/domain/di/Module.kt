@@ -2,8 +2,8 @@ package com.muhammhassan.epatrol.domain.di
 
 import com.muhammhassan.epatrol.core.di.Module.dataSourceModule
 import com.muhammhassan.epatrol.core.di.Module.datastoreModule
-import com.muhammhassan.epatrol.core.di.Module.provideApi
 import com.muhammhassan.epatrol.core.di.Module.repositoryModule
+import com.muhammhassan.epatrol.core.di.Module.retrofitModule
 import com.muhammhassan.epatrol.domain.interactor.AddEventInteractor
 import com.muhammhassan.epatrol.domain.interactor.DashboardInteractor
 import com.muhammhassan.epatrol.domain.interactor.DetailPatrolEventInteractor
@@ -27,11 +27,11 @@ object Module {
         single<TaskListUseCase> { TaskListInteractor(get(), get()) }
         single<PatrolDetailUseCase> { PatrolDetailInteractor(get(), get()) }
         single<DetailPatrolEventUseCase> { DetailPatrolEventInteractor(get(), get()) }
-        single<AddEventUseCase> { AddEventInteractor(get()) }
+        single<AddEventUseCase> { AddEventInteractor(get(), get()) }
         single<ProfileUseCase> { ProfileInteractor(get()) }
     }
 
-    fun retrofit(version: Int) = provideApi(version)
+    fun retrofit(version: Int) = retrofitModule(version)
     val datasourceModule = dataSourceModule
     val repModule = repositoryModule
     val dataStoreModule = datastoreModule
