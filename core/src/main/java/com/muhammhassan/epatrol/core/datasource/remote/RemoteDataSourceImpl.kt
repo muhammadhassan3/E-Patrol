@@ -2,9 +2,11 @@ package com.muhammhassan.epatrol.core.datasource.remote
 
 import com.muhammhassan.epatrol.core.datasource.remote.api.ApiInterface
 import com.muhammhassan.epatrol.core.model.ApiResponse
+import com.muhammhassan.epatrol.core.model.EventDetailResponse
 import com.muhammhassan.epatrol.core.model.LoginResponse
 import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
-import com.muhammhassan.epatrol.core.model.PatrolResponse
+import com.muhammhassan.epatrol.core.model.PatrolEventData
+import com.muhammhassan.epatrol.core.model.PatrolItemResponse
 import com.muhammhassan.epatrol.core.utils.Utils.parseError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,9 +23,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         flow {
             emit(ApiResponse.Loading)
             val response = api.login(email, password)
-            val body = response.body()
             if (response.isSuccessful) {
-                body?.data?.let {
+                response.body()?.data?.let {
                     emit(ApiResponse.Success(it))
                 }
             } else {
@@ -34,12 +35,12 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
             emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
         }
 
-    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>> = flow {
+    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> = flow {
         emit(ApiResponse.Loading)
         val response = api.getPatrolTask()
         if (response.isSuccessful) {
             response.body()?.data?.let {
-                emit(ApiResponse.Success(it))
+                emit(ApiResponse.Success(it.list))
             }
         } else {
             emit(ApiResponse.Error(response.parseError()))
@@ -48,6 +49,45 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         Timber.e(error)
         emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
+
+    override suspend fun getTaskEventList(patrolId: Long): Flow<ApiResponse<List<PatrolEventData>>> =
+        flow {
+            emit(ApiResponse.Loading)
+            val response = api.getPatrolEvent(patrolId)
+            if (response.isSuccessful) {
+                response.body()?.data?.let {
+                    emit(ApiResponse.Success(it.list))
+                }
+            } else {
+                emit(
+                    if (response.code() == 404) ApiResponse.Success(
+                        emptyList<PatrolEventData>()
+                    )
+                    else ApiResponse.Error(
+                        response.parseError()
+                    )
+                )
+            }
+        }.catch {
+            Timber.e(it)
+            emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+        }
+
+    override suspend fun getEventDetail(eventId: Long): Flow<ApiResponse<EventDetailResponse>> =
+        flow {
+            emit(ApiResponse.Loading)
+            val response = api.getEventDetail(eventId)
+            if (response.isSuccessful) {
+                response.body()?.data?.let {
+                    emit(ApiResponse.Success(it))
+                }
+            } else {
+                emit(ApiResponse.Error(response.parseError()))
+            }
+        }.catch {
+            Timber.e(it)
+            emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+        }
 
     override suspend fun verifyPatrol(id: Long): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
@@ -64,7 +104,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
 
     override suspend fun getPatrolDetail(id: Long): Flow<ApiResponse<PatrolDetailResponse>> = flow {
         emit(ApiResponse.Loading)
-        val response = api.getDetail(id)
+        val response = api.getPatrolDetail(id)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(response.body()?.data))
         } else {
@@ -97,7 +137,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         action: String,
         image: File,
         lat: Double,
-        long: Double
+        long: Double,
+        authorName: String
     ): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
         val actionPart = action.toRequestBody("text/plain".toMediaType())
@@ -105,19 +146,37 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val summaryPart = summary.toRequestBody("text/plain".toMediaType())
         val latitudePart = lat.toString().toRequestBody("text/plain".toMediaType())
         val longitudePart = long.toString().toRequestBody("text/plain".toMediaType())
+        val patrolIdPart = patrolId.toString().toRequestBody("text/plain".toMediaType())
+        val authorPart = authorName.toRequestBody("text/plain".toMediaType())
         val imageFile = image.asRequestBody("image/jpeg".toMediaType())
         val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
-            "photo", image.name, imageFile
+            "foto", image.name, imageFile
         )
+
+        //Use this when request type is Multipart
         val response = api.addEvent(
-            patrolId = patrolId,
+            patrolId = patrolIdPart,
             event = eventPart,
             image = imageMultipart,
             action = actionPart,
             summary = summaryPart,
             latitude = latitudePart,
-            longitude = longitudePart
+            longitude = longitudePart,
+            author = authorPart
         )
+
+        //Use this when request type is Request Body
+//        val response = api.addEventRequestBody(
+//            patrolId,
+//            image.name,
+//            event,
+//            action,
+//            summary,
+//            lat,
+//            long,
+//            authorName
+//        )
+
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
         } else {
@@ -131,9 +190,9 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
     override suspend fun markAsDonePatrol(patrolId: Long): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
         val response = api.markAsDonePatrol(patrolId)
-        if(response.isSuccessful){
+        if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
-        }else{
+        } else {
             emit(ApiResponse.Error(response.parseError()))
         }
     }.catch {
