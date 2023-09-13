@@ -50,7 +50,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.muhammhassan.epatrol.component.ConfirmDialogView
 import com.muhammhassan.epatrol.component.LoadingDialog
-import com.muhammhassan.epatrol.domain.model.PatrolEventModel
+import com.muhammhassan.epatrol.domain.model.EventDetailModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
@@ -59,24 +59,25 @@ import com.muhammhassan.epatrol.ui.theme.Red20
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Clock24
-import compose.icons.octicons.CrossReference24
+import compose.icons.octicons.Image24
 import compose.icons.octicons.Location24
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailView(
     onNavUp: () -> Unit,
-    data: PatrolEventModel,
+    uiState: UiState<EventDetailModel>,
     deleteState: UiState<Nothing>?,
     onResponseSuccess: () -> Unit,
     onDeleteAction: (eventId: Long) -> Unit,
-    email: String,
     removable: Boolean,
     showLocationOnMap: (lat: Double, long: Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val data = remember {
+        mutableStateOf<EventDetailModel?>(null)
+    }
     val isLoading = remember {
         mutableStateOf(false)
     }
@@ -91,6 +92,26 @@ fun EventDetailView(
     val errorMessage = remember {
         mutableStateOf("")
     }
+
+    LaunchedEffect(key1 = uiState, block = {
+        when (uiState) {
+            is UiState.Error -> {
+                isLoading.value = false
+                isErrorDialogShow.value = true
+                errorMessage.value = uiState.message
+
+            }
+
+            UiState.Loading -> {
+                isLoading.value = true
+            }
+
+            is UiState.Success -> {
+                isLoading.value = false
+                data.value = uiState.data
+            }
+        }
+    })
 
     LaunchedEffect(key1 = deleteState, block = {
         when (deleteState) {
@@ -115,18 +136,29 @@ fun EventDetailView(
     })
 
     if (isConfirmDialogShow.value) {
-        Dialog(onDismissRequest = { isConfirmDialogShow.value = false }) {
-            ConfirmDialogView(message = "Apakah kamu yakin ingin menghapus kejadian ini dari laporan?",
-                onDismiss = { isConfirmDialogShow.value = false },
-                onConfirm = {
-                    isConfirmDialogShow.value = false
-                    onDeleteAction.invoke(data.id)
-                })
+        if (data.value != null) {
+            Dialog(onDismissRequest = { isConfirmDialogShow.value = false }) {
+                ConfirmDialogView(message = "Apakah kamu yakin ingin menghapus kejadian ini dari laporan?",
+                    onDismiss = { isConfirmDialogShow.value = false },
+                    onConfirm = {
+                        isConfirmDialogShow.value = false
+                        onDeleteAction.invoke(data.value!!.id)
+                    })
+            }
+        } else {
+            AlertDialog(onDismissRequest = { isConfirmDialogShow.value = false }, confirmButton = {
+                TextButton(onClick = { isConfirmDialogShow.value = false }) {
+                    Text(text = "Oke")
+                }
+            }, text = {
+                Text(text = "Gagal menghapus data, data tidak tersedia.\nSilahkan muat ulang halaman ini")
+            }, title = {
+                Text(text = "Pemberitahuan")
+            })
         }
     }
 
     if (isErrorDialogShow.value) {
-        Timber.e("Dialog recomposed")
         AlertDialog(onDismissRequest = { isErrorDialogShow.value = false }, confirmButton = {
             TextButton(onClick = { isErrorDialogShow.value = false }) {
                 Text(text = "Oke")
@@ -156,131 +188,141 @@ fun EventDetailView(
                 )
             }
         }, actions = {
-            PlainTooltipBox(tooltip = { Text(text = "Lihat lokasi") }) {
-                IconButton(onClick = {
-                    showLocationOnMap.invoke(data.lat, data.long)
-                }, modifier = Modifier.tooltipAnchor()) {
-                    Icon(
-                        painter = rememberVectorPainter(image = Octicons.Location24),
-                        contentDescription = "Lihat Location"
-                    )
+            data.value?.let { data ->
+                PlainTooltipBox(tooltip = { Text(text = "Lihat lokasi") }) {
+                    IconButton(onClick = {
+                        showLocationOnMap.invoke(data.lat, data.long)
+                    }, modifier = Modifier.tooltipAnchor()) {
+                        Icon(
+                            painter = rememberVectorPainter(image = Octicons.Location24),
+                            contentDescription = "Lihat Location"
+                        )
+                    }
                 }
             }
         })
-    }) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .verticalScroll(state = scrollState)
-        ) {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(data.image).crossfade(true)
-                    .diskCacheKey(data.image).diskCachePolicy(CachePolicy.ENABLED).build(),
-                contentDescription = "Gambar kejadian",
+    }) { padding ->
+        data.value?.let { data ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                error = {
-                    Icon(
-                        painter = rememberVectorPainter(image = Octicons.CrossReference24),
-                        contentDescription = "Gagal memuat gambar"
-                    )
-                },
-                loading = {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(55.dp), color = Primary
-                    )
-                },
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                    .padding(padding)
+                    .fillMaxSize()
+                    .verticalScroll(state = scrollState)
             ) {
-                Column(
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current).data(data.image)
+                        .crossfade(true)
+                        .diskCacheKey(data.image).diskCachePolicy(CachePolicy.ENABLED).build(),
+                    contentDescription = "Gambar kejadian",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp)
-                ) {
-                    Row(modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        .height(200.dp)
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    error = {
                         Icon(
-                            painter = rememberVectorPainter(image = Octicons.Clock24),
-                            contentDescription = "Icon waktu",
+                            painter = rememberVectorPainter(image = Octicons.Image24),
+                            contentDescription = "Gagal memuat gambar"
+                        )
+                    },
+                    loading = {
+                        CircularProgressIndicator(
                             modifier = Modifier
-                                .size(12.dp)
-                                .align(Alignment.CenterVertically)
+                                .align(Alignment.Center)
+                                .size(55.dp), color = Primary
                         )
-                        Text(
-                            text = data.createdAt,
-                            modifier = Modifier,
-                            style = TextStyle(fontSize = 12.sp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = data.title,
-                        modifier = Modifier,
-                        style = TextStyle(fontWeight = FontWeight.Black, fontSize = 16.sp),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Deskripsi Kejadian",
-                        modifier = Modifier,
-                        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = data.summary,
-                        modifier = Modifier,
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Tindakan yang dilakukan",
-                        modifier = Modifier,
-                        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = data.action, modifier = Modifier, style = TextStyle(fontSize = 12.sp)
-                    )
-                }
-            }
-            if (email == data.author && removable) {
-                Spacer(modifier = Modifier.weight(1f))
+                    },
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(
-                        topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp
-                    )
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp)
+                            .padding(12.dp)
                     ) {
-                        Button(
-                            onClick = { isConfirmDialogShow.value = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Red20),
-                            contentPadding = PaddingValues(12.dp)
+                        Row(
+                            modifier = Modifier,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
-                            Text(
-                                text = "Hapus Kejadian",
-                                style = TextStyle(fontSize = 16.sp, color = Red)
+                            Icon(
+                                painter = rememberVectorPainter(image = Octicons.Clock24),
+                                contentDescription = "Icon waktu",
+                                modifier = Modifier
+                                    .size(12.dp)
+                                    .align(Alignment.CenterVertically)
                             )
+                            Text(
+                                text = data.createdAt,
+                                modifier = Modifier,
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = data.title,
+                            modifier = Modifier,
+                            style = TextStyle(fontWeight = FontWeight.Black, fontSize = 16.sp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Deskripsi Kejadian",
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.summary,
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Tindakan yang dilakukan",
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.action,
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                    }
+                }
+                if (removable) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(
+                            topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp)
+                        ) {
+                            Button(
+                                onClick = { isConfirmDialogShow.value = true },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = Red20),
+                                contentPadding = PaddingValues(12.dp)
+                            ) {
+                                Text(
+                                    text = "Hapus Kejadian",
+                                    style = TextStyle(fontSize = 16.sp, color = Red)
+                                )
+                            }
                         }
                     }
                 }
@@ -293,18 +335,7 @@ fun EventDetailView(
 @Composable
 fun EventDetailPreview() {
     EPatrolTheme {
-        EventDetailView(data = PatrolEventModel(
-            0L,
-            "",
-            "Patroli keamanan Malam Hari bertujuan untuk mencegah tindakan kriminal seperti perampokan, pencurian, vandalisme",
-            "Kecelakaan lalu lintas",
-            "Evakuasi korban",
-            createdAt = "2 Juni 2023 13:24",
-            lat = 0.0,
-            long = 0.0,
-            author = "budi@gmail.com"
-        ),
-            email = "budi@gmail.com",
+        EventDetailView(uiState = UiState.Loading,
             onNavUp = {},
             onDeleteAction = {},
             deleteState = UiState.Loading,
