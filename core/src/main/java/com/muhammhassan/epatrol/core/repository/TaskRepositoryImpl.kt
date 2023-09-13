@@ -2,13 +2,15 @@ package com.muhammhassan.epatrol.core.repository
 
 import com.muhammhassan.epatrol.core.datasource.remote.RemoteDataSource
 import com.muhammhassan.epatrol.core.model.ApiResponse
+import com.muhammhassan.epatrol.core.model.EventDetailResponse
 import com.muhammhassan.epatrol.core.model.PatrolDetailResponse
-import com.muhammhassan.epatrol.core.model.PatrolResponse
+import com.muhammhassan.epatrol.core.model.PatrolEventData
+import com.muhammhassan.epatrol.core.model.PatrolItemResponse
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskRepository {
-    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolResponse>>> {
+    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> {
         return remoteDataSource.getTaskList()
     }
 
@@ -18,6 +20,14 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
 
     override suspend fun getDetailPatrol(id: Long): Flow<ApiResponse<PatrolDetailResponse>> {
         return remoteDataSource.getPatrolDetail(id)
+    }
+
+    override suspend fun getEventList(patrolId: Long): Flow<ApiResponse<List<PatrolEventData>>> {
+        return remoteDataSource.getTaskEventList(patrolId)
+    }
+
+    override suspend fun getEventDetail(eventId: Long): Flow<ApiResponse<EventDetailResponse>> {
+        return remoteDataSource.getEventDetail(eventId)
     }
 
     override suspend fun deletePatrolEvent(
@@ -33,7 +43,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
         action: String,
         image: File,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        authorName: String
     ): Flow<ApiResponse<Nothing>> {
         return remoteDataSource.addPatrolEvent(
             patrolId,
@@ -42,7 +53,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
             action,
             image,
             latitude,
-            longitude
+            longitude,
+            authorName
         )
     }
 
