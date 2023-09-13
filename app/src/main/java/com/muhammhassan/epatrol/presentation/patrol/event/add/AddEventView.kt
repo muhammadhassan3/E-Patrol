@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,13 +36,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,9 +61,8 @@ import com.muhammhassan.epatrol.ui.theme.Secondary
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Image24
-import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddEventView(
     onNavUp: () -> Unit,
@@ -72,23 +79,29 @@ fun AddEventView(
     onResponseSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isLoading = remember{
+    val isLoading = remember {
         mutableStateOf(false)
     }
 
-    val isDialogShow = remember{
+    val isDialogShow = remember {
         mutableStateOf(false)
     }
 
-    val dialogMessage = remember{
+    val dialogMessage = remember {
         mutableStateOf("")
     }
-    
-    if(isLoading.value){
+
+    val summaryFocus = remember {
+        FocusRequester()
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    if (isLoading.value) {
         LoadingDialog(onDismiss = { isLoading.value = false })
     }
-    
-    if(isDialogShow.value){
+
+    if (isDialogShow.value) {
         AlertDialog(onDismissRequest = { isDialogShow.value = false }, confirmButton = {
             TextButton(onClick = { isDialogShow.value = false }) {
                 Text(text = "Oke")
@@ -100,23 +113,26 @@ fun AddEventView(
         })
     }
 
-    LaunchedEffect(key1 = addState, block ={
-        when(addState){
+    LaunchedEffect(key1 = addState, block = {
+        when (addState) {
             is UiState.Error -> {
                 isLoading.value = false
                 dialogMessage.value = addState.message
                 isDialogShow.value = true
             }
+
             UiState.Loading -> {
                 isLoading.value = true
             }
+
             is UiState.Success -> {
                 isLoading.value = false
                 onResponseSuccess.invoke()
             }
+
             null -> {}
         }
-    } )
+    })
 
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
@@ -170,7 +186,11 @@ fun AddEventView(
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
-                        )
+                        ),
+                        keyboardActions = KeyboardActions(onNext = {
+                            summaryFocus.requestFocus()
+                        }),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -181,7 +201,10 @@ fun AddEventView(
                     OutlinedTextField(
                         value = summary,
                         onValueChange = summaryChanged,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(summaryFocus)
+                            .onFocusChanged { if (it.isFocused) keyboardController?.show() },
                         placeholder = {
                             Text(
                                 text = "Berikan deskripsi singkat kejadian",
@@ -233,7 +256,7 @@ fun AddEventView(
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color.LightGray)
                         .clickable { onCaptureImage.invoke() }) {
-                        if (image == null) {
+                        if (image == null || image.toString() == "") {
 
                             Column(
                                 modifier = Modifier.align(Alignment.Center),
@@ -248,7 +271,6 @@ fun AddEventView(
                                 Text(text = "Pilih Gambar", style = TextStyle(color = Secondary))
                             }
                         } else {
-                            Timber.e(image.toString())
                             AsyncImage(
                                 model = image,
                                 contentDescription = "Image",
@@ -267,7 +289,7 @@ fun AddEventView(
                 ),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Box(modifier = Modifier.padding(24.dp)){
+                Box(modifier = Modifier.padding(24.dp)) {
                     Button(
                         onClick = onSubmit,
                         modifier = Modifier.fillMaxWidth(),
