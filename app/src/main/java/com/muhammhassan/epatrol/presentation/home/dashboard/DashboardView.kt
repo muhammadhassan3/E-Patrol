@@ -233,11 +233,9 @@ fun DashboardView(
                 contentDescription = "Profile Picture",
                 contentScale = ContentScale.Crop,
                 loading = {
-                    Timber.i("Image Loading")
                     CircularProgressIndicator()
                 },
                 error = {
-                    Timber.e(it.result.throwable)
                     Icon(
                         painter = rememberVectorPainter(image = Octicons.Person24),
                         contentDescription = "Icon profile"
