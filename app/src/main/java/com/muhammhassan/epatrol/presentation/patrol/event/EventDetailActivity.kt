@@ -2,7 +2,6 @@ package com.muhammhassan.epatrol.presentation.patrol.event
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,7 +12,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
@@ -24,15 +22,14 @@ class EventDetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val patrolId = intent.getLongExtra(patrolId, 0L)
         val removable = intent.getBooleanExtra(removable, false)
-        val event = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(eventData, PatrolEventModel::class.java)
-        } else {
-            intent.getParcelableExtra(eventData)
-        } ?: throw IllegalArgumentException("Data bundle cannot null")
+        val eventId = intent.getLongExtra(eventId, 0)
         viewModel.patrolId = patrolId
+        viewModel.eventId = eventId
+        viewModel.getData()
         setContent {
             val email by viewModel.email.collectAsStateWithLifecycle()
             val deleteState by viewModel.deleteState.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             EPatrolTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -40,7 +37,7 @@ class EventDetailActivity : ComponentActivity() {
                 ) {
                     EventDetailView(
                         onNavUp = { finish() },
-                        data = event,
+                        uiState = uiState,
                         onDeleteAction = viewModel::deleteEvent,
                         email = email,
                         deleteState = deleteState,
@@ -79,7 +76,7 @@ class EventDetailActivity : ComponentActivity() {
 
     companion object {
         const val patrolId = "patrol_id"
-        const val eventData = "event_data"
+        const val eventId = "event_id"
         const val removable = "removable"
     }
 }
