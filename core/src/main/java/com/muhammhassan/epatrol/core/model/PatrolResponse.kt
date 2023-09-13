@@ -1,13 +1,48 @@
 package com.muhammhassan.epatrol.core.model
 
+import com.google.gson.annotations.SerializedName
+import timber.log.Timber
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 data class PatrolResponse(
-    val status: String,
-    val alamat: String,
-    val tanggal: String,
-    val jam: String,
-    val ketua: String,
-    val verified: Boolean,
-    val judul: String,
-    val id: Long,
-    val plate: String
+    @SerializedName("list data Patroli") val list: List<PatrolItemResponse>
 )
+
+data class PatrolItemResponse(
+    val status: String,
+    @SerializedName("lokasi") val alamat: String,
+    @SerializedName("tgl_pelaksanaan") private val tglPelaksanaan: String,
+    @SerializedName("waktu_mulai") val jam: String,
+    @SerializedName("email") val ketua: String,
+    private val verified: Int,
+    val id: Long,
+    @SerializedName("no_polisi") val plate: String
+) {
+    val judul: String
+        get() {
+            val numberFormatter = DecimalFormat("00000000")
+            return "Patroli-${numberFormatter.format(id)}"
+        }
+
+    val isVerified: Boolean
+        get() = verified == 1
+
+    val tanggal: String
+        get() {
+            return try {
+                val responseFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val date = responseFormat.parse(tglPelaksanaan)
+                val resultFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                if (date != null) {
+                    resultFormat.format(date)
+                }else{
+                    "Tanggal tidak tersedia"
+                }
+            } catch (e: Exception) {
+                Timber.e(IllegalArgumentException("Invalid date format pattern"))
+                "Gagal memuat tanggal"
+            }
+        }
+}
