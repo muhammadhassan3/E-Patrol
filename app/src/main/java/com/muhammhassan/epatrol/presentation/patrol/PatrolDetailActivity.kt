@@ -22,12 +22,14 @@ class PatrolDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra(id, 0)
-        viewModel.getDetail(id)
+        viewModel.patrolId = id
+        viewModel.getDetail()
         setContent {
             EPatrolTheme {
                 val state by viewModel.state.collectAsState()
                 val email by viewModel.email.collectAsState()
                 val markAsDoneState by viewModel.confirmState.collectAsStateWithLifecycle()
+                val eventState by viewModel.eventState.collectAsStateWithLifecycle()
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
@@ -39,7 +41,9 @@ class PatrolDetailActivity : ComponentActivity() {
                         navigateToDetailEvent = ::navigateToDetailEvent,
                         confirmState = markAsDoneState,
                         onCompleteSuccess = ::completedPatrolAction,
-                        markAsDonePatrol = viewModel::verify
+                        markAsDonePatrol = viewModel::verify,
+                        onRefresh = viewModel::getDetail,
+                        eventState = eventState
                     )
                 }
             }
@@ -56,11 +60,11 @@ class PatrolDetailActivity : ComponentActivity() {
         val intent = Intent(this, EventDetailActivity::class.java)
         intent.putExtra(EventDetailActivity.patrolId, viewModel.patrolId)
         intent.putExtra(EventDetailActivity.removable, removable)
-        intent.putExtra(EventDetailActivity.eventData, data)
+        intent.putExtra(EventDetailActivity.eventId, data.id)
         startActivity(intent)
     }
 
-    private fun completedPatrolAction(){
+    private fun completedPatrolAction() {
         setResult(RESULT_OK)
         finish()
     }
