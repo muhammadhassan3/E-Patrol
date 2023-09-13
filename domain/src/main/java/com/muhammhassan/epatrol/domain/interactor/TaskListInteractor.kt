@@ -23,7 +23,7 @@ class TaskListInteractor(private val task: TaskRepository, private val user: Use
                         date = it.tanggal,
                         hour = it.jam,
                         lead = it.ketua,
-                        verified = it.verified,
+                        verified = it.isVerified,
                         address = it.alamat,
                         plate = it.plate
                     )
@@ -34,7 +34,7 @@ class TaskListInteractor(private val task: TaskRepository, private val user: Use
 
     override fun getUser(): Flow<UserModel> {
         return user.getUser().map {
-            UserModel(it.name!!, it.profile!!, it.email!!, it.jabatan!!, it.nrp!!)
+            UserModel(it.name ?: "", it.profile ?: "", it.email ?: "", it.jabatan ?: "", it.nrp ?: "")
         }
     }
 
