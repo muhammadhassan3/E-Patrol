@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -16,10 +17,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +40,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.domain.model.UiState
-import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
 import com.muhammhassan.epatrol.ui.theme.Secondary
@@ -49,7 +47,6 @@ import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,7 +177,7 @@ fun LoginView(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrect = false,
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Go
+                    imeAction = ImeAction.Send
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Primary,
@@ -193,7 +190,10 @@ fun LoginView(
                             contentDescription = if (isPasswordShow.value) "Hide Password" else "Show Password"
                         )
                     }
+                }, keyboardActions = KeyboardActions(onSend = {
+                    viewModel.login()
                 })
+            )
             Text(text = "Lupa Password?", modifier = Modifier.constrainAs(forgetPassword) {
                 end.linkTo(parent.end, 16.dp)
                 top.linkTo(edtPassword.bottom, 8.dp)
@@ -210,7 +210,12 @@ fun LoginView(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text(text = "Masuk", fontWeight = FontWeight.Medium, fontSize = 16.sp, color = Color.White)
+                Text(
+                    text = "Masuk",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
             }
 
             Row(modifier = Modifier.constrainAs(layoutRegister) {
