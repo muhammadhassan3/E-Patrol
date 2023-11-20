@@ -15,3 +15,6 @@
 local.properties
 /temp_assets/
 /app/google-services.json
+/.idea/deploymentTargetDropDown.xml
+/app/release/e-patrol-1-0-2.apk
+/app/release/output-metadata.json
