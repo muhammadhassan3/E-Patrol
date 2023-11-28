@@ -13,6 +13,7 @@ interface RemoteDataSource {
     suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>>
 
     suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>
+    suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>
 
     suspend fun getTaskEventList(patrolId: Long): Flow<ApiResponse<List<PatrolEventData>>>
     suspend fun getEventDetail(eventId: Long): Flow<ApiResponse<EventDetailResponse>>
@@ -21,7 +22,7 @@ interface RemoteDataSource {
 
     suspend fun getPatrolDetail(id: Long): Flow<ApiResponse<PatrolDetailResponse>>
 
-    suspend fun deletePatrolEvent(patrolId: Long, eventId: Long): Flow<ApiResponse<Nothing>>
+    suspend fun deletePatrolEvent(eventId: Long): Flow<ApiResponse<Nothing>>
 
     suspend fun addPatrolEvent(
         patrolId: Long,
@@ -31,7 +32,8 @@ interface RemoteDataSource {
         image: File,
         lat: Double,
         long: Double,
-        authorName: String
+        authorName: String,
+        date: String,
     ): Flow<ApiResponse<Nothing>>
 
     suspend fun markAsDonePatrol(

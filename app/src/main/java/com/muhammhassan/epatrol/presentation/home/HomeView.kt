@@ -33,7 +33,7 @@ import com.muhammhassan.epatrol.presentation.home.profile.ProfileViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListView
 import com.muhammhassan.epatrol.presentation.home.task.TaskListViewModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
-import com.muhammhassan.epatrol.ui.theme.Tertiary
+import com.muhammhassan.epatrol.ui.theme.Tertiary10
 import com.muhammhassan.epatrol.utils.NavigationItem
 import com.muhammhassan.epatrol.utils.Screen
 import compose.icons.Octicons
@@ -65,18 +65,14 @@ fun HomeView(
             navigation.map { item ->
                 NavigationBarItem(selected = currentRoute == item.screen.route, onClick = {
                     navController.navigate(item.screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        restoreState = true
+                        popUpTo(navController.graph.findStartDestination().id)
                         launchSingleTop = true
                     }
                 }, icon = {
                     Icon(imageVector = item.icon, contentDescription = "${item.title} page")
                 }, label = {
                     Text(text = item.title)
-                }, colors = NavigationBarItemDefaults.colors(indicatorColor = Tertiary)
-                )
+                }, colors = NavigationBarItemDefaults.colors(indicatorColor = Tertiary10))
             }
         }
     }, topBar = {
@@ -119,9 +115,17 @@ fun HomeView(
                 DashboardView(
                     uiState = state,
                     user = user,
-                    onProfileClicked = { /*TODO*/ },
+                    onProfileClicked = {
+                        navController.navigate(Screen.Profile.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = false
+                            }
+                            restoreState = true
+                            launchSingleTop = true
+                        }
+                    },
                     onNotificationClicked = { /*TODO*/ },
-                    navigateToDetailPage = { navigateToDetailPage(it) },
+                    navigateToDetailPage = navigateToDetailPage,
                     onRefreshTriggered = viewModel::getTask,
                     verifyUser = viewModel::verifyPatrol,
                     verifyState = verifyState,

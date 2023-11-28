@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://simple-rol.protic.web.id/api/"'
+            buildConfigField "String", "BASE_URL", '"https://epatrol.protic.web.id/api/"'
         }
         release {
             minifyEnabled false
@@ -52,9 +52,9 @@ dependencies {
 
     //datastore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
 
     //coroutine
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 }

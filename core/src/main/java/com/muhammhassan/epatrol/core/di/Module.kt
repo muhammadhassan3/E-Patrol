@@ -37,7 +37,7 @@ object Module {
         single { DataStorePreferences(androidContext().datastore) }
     }
 
-    fun provideApi(version: Int, dataStore: DataStorePreferences): ApiInterface {
+    private fun provideApi(version: Int, dataStore: DataStorePreferences): ApiInterface {
         val client = OkHttpClient.Builder().addInterceptor {
             val requestBuilder = it.request().newBuilder()
             requestBuilder.addHeader("platform", "Android")
@@ -49,7 +49,7 @@ object Module {
             val requestBuilder = it.request().newBuilder()
             runBlocking {
                 val token = dataStore.getToken().first()
-                if(token!= null){
+                if(token!= null && !it.request().url.encodedPath.endsWith("auth")){
                     requestBuilder.addHeader("Authorization", "Bearer $token")
                 }
             }

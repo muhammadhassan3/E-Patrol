@@ -25,7 +25,7 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
 
-    var patrolId = 0L
+    var orderId = 0L
 
     init {
         viewModelScope.launch {
@@ -37,13 +37,13 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
 
     fun getDetail() {
         viewModelScope.launch {
-            useCase.getDetailPatrol(patrolId).collect {
+            useCase.getDetailPatrol(orderId).collect {
+                if (it is UiState.Success) {
+                    it.data?.let { data -> getPatrolEvents(data.patrolId) }
+                }
                 _state.value = it
             }
 
-            useCase.getEventList(patrolId).collect {
-                _eventState.value = it
-            }
         }
     }
 
@@ -52,6 +52,13 @@ class PatrolDetailViewModel(private val useCase: PatrolDetailUseCase) : ViewMode
             useCase.markAsDone(id).collect {
                 _confirmState.value = it
             }
+        }
+    }
+
+    private suspend fun getPatrolEvents(orderId: Long) {
+
+        useCase.getEventList(orderId).collect {
+            _eventState.value = it
         }
     }
 }

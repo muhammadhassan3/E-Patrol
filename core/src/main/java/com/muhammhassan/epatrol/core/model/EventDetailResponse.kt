@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class EventDetailResponse(
     val id: Long,
-    @SerializedName("foto_kejadian")
+    @SerializedName("foto")
     val image: String,
     @SerializedName("uraian_kejadian")
     val summary: String,

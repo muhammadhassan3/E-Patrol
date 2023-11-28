@@ -13,19 +13,20 @@ import kotlinx.coroutines.flow.map
 class TaskListInteractor(private val task: TaskRepository, private val user: UserRepository) :
     TaskListUseCase {
     override suspend fun getTaskList(): Flow<UiState<List<PatrolModel>>> {
-        return task.getTaskList().map { response ->
+        return task.getCompletedTaskList().map { response ->
             response.mapToUiState { list ->
                 list.map {
                     PatrolModel(
                         id = it.id,
-                        status = it.status,
+                        status = it.status ?: "Gagal mendapatkan status",
                         title = it.judul,
                         date = it.tanggal,
                         hour = it.jam,
                         lead = it.ketua,
                         verified = it.isVerified,
                         address = it.alamat,
-                        plate = it.plate
+                        plate = it.plate,
+                        patrolId = it.patrolId
                     )
                 }
             }

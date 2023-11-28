@@ -41,9 +41,9 @@ import compose.icons.octicons.Clock24
 import compose.icons.octicons.KebabHorizontal24
 
 @Composable
-fun PatrolItem(model: PatrolModel, onItemClick: (id: Long, plate: String) -> Unit, modifier: Modifier = Modifier) {
+fun PatrolItem(model: PatrolModel, onItemClick: (data: PatrolModel) -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.fillMaxWidth().clickable { onItemClick(model.id, model.plate) },
+        modifier = modifier.fillMaxWidth().clickable { onItemClick(model) },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
@@ -164,8 +164,9 @@ fun PatrolItemPreview() {
             address = "Jl. Dr. Soetomo",
             verified = false,
             lead = "ade@email.co",
-            plate = "R 0000 CH"
-        ), onItemClick = { _,_ ->/*TODO*/ })
+            plate = "R 0000 CH",
+            patrolId = 2L
+        ), onItemClick = {})
     }
 }
 
@@ -183,7 +184,8 @@ fun PatrolItemPreview2() {
             address = "Jl. Dr. Soetomo",
             verified = false,
             lead = "ade@email.co",
-            plate = "R 0000 CH"
-        ), onItemClick = { _,_ ->/*TODO*/ })
+            plate = "R 0000 CH",
+            patrolId = 2
+        ), onItemClick = {})
     }
 }

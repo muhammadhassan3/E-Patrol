@@ -16,13 +16,11 @@ class EventDetailViewModel(private val useCase: DetailPatrolEventUseCase) : View
     private val _deleteState = MutableStateFlow<UiState<Nothing>?>(null)
     val deleteState = _deleteState.asStateFlow()
 
-    var patrolId: Long = 0L
     var eventId: Long = 0L
-
 
     fun deleteEvent(eventId: Long) {
         viewModelScope.launch {
-            useCase.deleteEvent(patrolId, eventId).collect {
+            useCase.deleteEvent(eventId).collect {
                 _deleteState.value = it
             }
         }

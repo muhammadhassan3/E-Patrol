@@ -14,7 +14,8 @@ interface AddEventUseCase {
         image: File,
         lat: Double,
         long: Double,
-        authorName:String
+        authorName:String,
+        date: String
     ): Flow<UiState<Nothing>>
 
     fun getUser(): Flow<UserModel>

@@ -2,6 +2,7 @@ package com.muhammhassan.epatrol.domain.model
 
 data class PatrolModel(
     val id: Long,
+    val patrolId: Long,
     val status: String,
     val title: String,
     val date: String,

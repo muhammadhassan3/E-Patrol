@@ -20,10 +20,8 @@ class EventDetailActivity : ComponentActivity() {
     private val viewModel by viewModel<EventDetailViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val patrolId = intent.getLongExtra(patrolId, 0L)
         val removable = intent.getBooleanExtra(removable, false)
         val eventId = intent.getLongExtra(eventId, 0)
-        viewModel.patrolId = patrolId
         viewModel.eventId = eventId
         viewModel.getData()
         setContent {
@@ -73,7 +71,6 @@ class EventDetailActivity : ComponentActivity() {
     }
 
     companion object {
-        const val patrolId = "patrol_id"
         const val eventId = "event_id"
         const val removable = "removable"
     }

@@ -11,19 +11,21 @@ data class PatrolResponse(
 )
 
 data class PatrolItemResponse(
-    val status: String,
+    val status: String?,
     @SerializedName("lokasi") val alamat: String,
     @SerializedName("tgl_pelaksanaan") private val tglPelaksanaan: String,
     @SerializedName("waktu_mulai") val jam: String,
-    @SerializedName("email") val ketua: String,
+    @SerializedName("ketua_regu") private val ketuaRaw: UserModel,
     private val verified: Int,
     val id: Long,
+    @SerializedName("patroli_id")  val patrolId: Long,
     @SerializedName("no_polisi") val plate: String
 ) {
+    val ketua: String get() = ketuaRaw.email ?: "Gagal memuat user"
     val judul: String
         get() {
             val numberFormatter = DecimalFormat("00000000")
-            return "Patroli-${numberFormatter.format(id)}"
+            return "Patroli-${numberFormatter.format((id.toString()+patrolId.toString()).toInt())}"
         }
 
     val isVerified: Boolean

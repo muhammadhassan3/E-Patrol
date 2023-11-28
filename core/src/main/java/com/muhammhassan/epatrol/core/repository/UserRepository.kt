@@ -11,5 +11,7 @@ interface UserRepository {
     fun getUser(): Flow<UserModel>
     fun getEmail(): Flow<String?>
 
+    fun getToken(): Flow<String?>
+
     suspend fun clear()
 }

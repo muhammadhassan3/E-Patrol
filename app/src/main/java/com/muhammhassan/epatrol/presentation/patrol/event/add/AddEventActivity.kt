@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
+import com.muhammhassan.epatrol.utils.camera.CameraActivity
 import com.muhammhassan.epatrol.utils.createCustomTempFile
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -70,6 +72,30 @@ class AddEventActivity : ComponentActivity() {
             }
         }
 
+    /**
+     * Handle Camera Activity Page
+     */
+    private val customCameraCallback =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                val data = it.data?.getStringExtra(CameraActivity.URI)
+                val uri = Uri.parse(data)
+                viewModel.setImage(uri)
+            }
+        }
+    private val cameraPermissionCallback =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                openCameraPage()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Silahkan izinkan penggunaan kamera untuk mengambil gambar",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
     private val permissionCallback =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             val result = it.all { permission ->
@@ -99,7 +125,7 @@ class AddEventActivity : ComponentActivity() {
             val action by viewModel.action.collectAsStateWithLifecycle()
             val state by viewModel.state.collectAsStateWithLifecycle()
             AddEventView(onNavUp = { finish() },
-                onCaptureImage = { openIntentCamera() },
+                onCaptureImage = { initCamera() },
                 image = image,
                 event = event,
                 eventChanged = viewModel::setEvent,
@@ -107,9 +133,7 @@ class AddEventActivity : ComponentActivity() {
                 summaryChanged = viewModel::setSummary,
                 action = action,
                 actionChanged = viewModel::setAction,
-                onSubmit = {
-                    viewModel.save(this@AddEventActivity)
-                },
+                onSubmit = viewModel::save,
                 addState = state,
                 onResponseSuccess = { navigateBack() })
         }
@@ -139,6 +163,21 @@ class AddEventActivity : ComponentActivity() {
         }
     }
 
+    private fun initCamera() {
+        if (ContextCompat.checkSelfPermission(
+                this, REQUIRED_CAMERA_PERMISISON
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            openCameraPage()
+        } else {
+            cameraPermissionCallback.launch(REQUIRED_CAMERA_PERMISISON)
+        }
+    }
+
+    private fun openCameraPage() {
+        customCameraCallback.launch(Intent(this, CameraActivity::class.java))
+    }
+
     private fun initLocation() {
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
         locationRequest =
@@ -150,20 +189,19 @@ class AddEventActivity : ComponentActivity() {
 
         client.checkLocationSettings(builder.build()).addOnSuccessListener {
 
-            }.addOnFailureListener {
-                if (it is ResolvableApiException) {
-                    try {
-                        locationIntentCallback.launch(
-                            IntentSenderRequest.Builder(it.resolution).build()
-                        )
-                    } catch (e: IntentSender.SendIntentException) {
-                        Timber.e(e)
-                        Toast.makeText(this, "Gagal menyelesaikan masalah", Toast.LENGTH_SHORT)
-                            .show()
-                        finish()
-                    }
+        }.addOnFailureListener {
+            if (it is ResolvableApiException) {
+                try {
+                    locationIntentCallback.launch(
+                        IntentSenderRequest.Builder(it.resolution).build()
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    Timber.e(e)
+                    Toast.makeText(this, "Gagal menyelesaikan masalah", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
             }
+        }
     }
 
     private fun startLocationUpdate() {
@@ -194,5 +232,7 @@ class AddEventActivity : ComponentActivity() {
         private val REQUIRED_LOCATION_PERMISSION = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
         )
+
+        private val REQUIRED_CAMERA_PERMISISON = Manifest.permission.CAMERA
     }
 }

@@ -24,14 +24,15 @@ class DashboardInteractor(private val user: UserRepository, private val task: Ta
                 list.map {
                     PatrolModel(
                         id = it.id,
-                        status = it.status,
+                        status = it.status ?: "Gagal mendapatkan status",
                         title = it.judul,
                         date = it.tanggal,
                         hour = it.jam,
                         lead = it.ketua,
                         verified = it.isVerified,
                         address = it.alamat,
-                        plate =  it.plate
+                        plate =  it.plate,
+                        patrolId = it.patrolId
                     )
                 }
             }

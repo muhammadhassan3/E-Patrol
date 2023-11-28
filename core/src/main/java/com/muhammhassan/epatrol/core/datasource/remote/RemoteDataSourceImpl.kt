@@ -40,7 +40,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val response = api.getPatrolTask()
         if (response.isSuccessful) {
             response.body()?.data?.let {
-                emit(ApiResponse.Success(it.list))
+                emit(ApiResponse.Success(it))
             }
         } else {
             emit(ApiResponse.Error(response.parseError()))
@@ -50,13 +50,28 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
 
+    override suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> = flow {
+        emit(ApiResponse.Loading)
+        val response = api.getCompletedPatrolTask()
+        if(response.isSuccessful){
+            response.body()?.data?.let {
+                emit(ApiResponse.Success(it))
+            }
+        } else {
+            emit(ApiResponse.Error(response.parseError()))
+        }
+    }.catch {
+        Timber.e(it)
+        emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+    }
+
     override suspend fun getTaskEventList(patrolId: Long): Flow<ApiResponse<List<PatrolEventData>>> =
         flow {
             emit(ApiResponse.Loading)
             val response = api.getPatrolEvent(patrolId)
             if (response.isSuccessful) {
                 response.body()?.data?.let {
-                    emit(ApiResponse.Success(it.list))
+                    emit(ApiResponse.Success(it))
                 }
             } else {
                 emit(
@@ -116,10 +131,10 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
     }
 
     override suspend fun deletePatrolEvent(
-        patrolId: Long, eventId: Long
+        eventId: Long
     ): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
-        val response = api.deleteEvent(patrolId, eventId)
+        val response = api.deleteEvent(eventId)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
         } else {
@@ -138,7 +153,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         image: File,
         lat: Double,
         long: Double,
-        authorName: String
+        authorName: String,
+        date: String
     ): Flow<ApiResponse<Nothing>> = flow {
         emit(ApiResponse.Loading)
         val actionPart = action.toRequestBody("text/plain".toMediaType())
@@ -146,36 +162,25 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val summaryPart = summary.toRequestBody("text/plain".toMediaType())
         val latitudePart = lat.toString().toRequestBody("text/plain".toMediaType())
         val longitudePart = long.toString().toRequestBody("text/plain".toMediaType())
-        val patrolIdPart = patrolId.toString().toRequestBody("text/plain".toMediaType())
         val authorPart = authorName.toRequestBody("text/plain".toMediaType())
         val imageFile = image.asRequestBody("image/jpeg".toMediaType())
         val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
             "foto", image.name, imageFile
         )
+        val datePart = date.toRequestBody("text/plain".toMediaType())
 
         //Use this when request type is Multipart
         val response = api.addEvent(
-            patrolId = patrolIdPart,
+            patrolId = patrolId,
             event = eventPart,
             image = imageMultipart,
             action = actionPart,
             summary = summaryPart,
             latitude = latitudePart,
             longitude = longitudePart,
-            author = authorPart
+            author = authorPart,
+            date = datePart
         )
-
-        //Use this when request type is Request Body
-//        val response = api.addEventRequestBody(
-//            patrolId,
-//            image.name,
-//            event,
-//            action,
-//            summary,
-//            lat,
-//            long,
-//            authorName
-//        )
 
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))

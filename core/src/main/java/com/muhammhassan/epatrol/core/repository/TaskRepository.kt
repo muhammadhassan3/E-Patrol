@@ -10,6 +10,7 @@ import java.io.File
 
 interface TaskRepository {
     suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>
+    suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>
 
     suspend fun verifyPatrolTask(id: Long): Flow<ApiResponse<Nothing>>
 
@@ -19,7 +20,7 @@ interface TaskRepository {
 
     suspend fun getEventDetail(eventId: Long): Flow<ApiResponse<EventDetailResponse>>
 
-    suspend fun deletePatrolEvent(patrolId: Long, eventId: Long): Flow<ApiResponse<Nothing>>
+    suspend fun deletePatrolEvent(eventId: Long): Flow<ApiResponse<Nothing>>
 
     suspend fun addPatrolEvent(
         patrolId: Long,
@@ -29,7 +30,8 @@ interface TaskRepository {
         image: File,
         latitude: Double,
         longitude: Double,
-        authorName: String
+        authorName: String,
+        date: String,
     ): Flow<ApiResponse<Nothing>>
 
     suspend fun markAsDone(patrolId: Long): Flow<ApiResponse<Nothing>>

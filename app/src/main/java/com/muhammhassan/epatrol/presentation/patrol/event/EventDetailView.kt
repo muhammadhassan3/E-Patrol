@@ -19,7 +19,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,11 +32,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,22 +41,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil.compose.SubcomposeAsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
+import com.muhammhassan.epatrol.component.AsyncImage
 import com.muhammhassan.epatrol.component.ConfirmDialogView
 import com.muhammhassan.epatrol.component.LoadingDialog
 import com.muhammhassan.epatrol.domain.model.EventDetailModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
-import com.muhammhassan.epatrol.ui.theme.Primary
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Clock24
-import compose.icons.octicons.Image24
 import compose.icons.octicons.Location24
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -207,33 +200,11 @@ fun EventDetailView(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .verticalScroll(state = scrollState)
+                    .verticalScroll(state = scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(data.image)
-                        .crossfade(true)
-                        .diskCacheKey(data.image).diskCachePolicy(CachePolicy.ENABLED).build(),
-                    contentDescription = "Gambar kejadian",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    error = {
-                        Icon(
-                            painter = rememberVectorPainter(image = Octicons.Image24),
-                            contentDescription = "Gagal memuat gambar"
-                        )
-                    },
-                    loading = {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(55.dp), color = Primary
-                        )
-                    },
-                    contentScale = ContentScale.Crop
-                )
+                Timber.e(data.image)
+                AsyncImage("", data.image, modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(8.dp))
                 Card(
                     modifier = Modifier

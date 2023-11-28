@@ -23,9 +23,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -63,14 +65,15 @@ import com.muhammhassan.epatrol.component.LoadingDialog
 import com.muhammhassan.epatrol.domain.model.PatrolDetailModel
 import com.muhammhassan.epatrol.domain.model.PatrolEventModel
 import com.muhammhassan.epatrol.domain.model.UiState
+import com.muhammhassan.epatrol.ui.theme.DarkGreen
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Secondary
 import com.muhammhassan.epatrol.utils.PatrolStatus
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
-import compose.icons.octicons.ArrowRight24
 import compose.icons.octicons.Calendar24
+import compose.icons.octicons.Check24
 import compose.icons.octicons.Clock24
 import compose.icons.octicons.Plus24
 import compose.icons.octicons.Sync24
@@ -94,13 +97,14 @@ fun PatrolDetailView(
         mutableStateOf(
             PatrolDetailModel(
                 0L,
-                "Patroli Keamanan Malam Hari",
-                "sedang-dikerjakan",
-                "Sprin/130/I/PAM.5.1.1/2023",
-                "2 Juli 2023",
-                "14.20",
-                "Patroli keamanan Malam Hari bertujuan untuk mencegah tindakan kriminal seperti perampokan, pencurian, vandalisme",
-                lead = "budi@gmail.com"
+                2,
+                "Memuat data",
+                "-",
+                "Sprin/---/-/---.-.-.-/----",
+                "-",
+                "-",
+                "-",
+                lead = "-"
             )
         )
     }
@@ -207,7 +211,7 @@ fun PatrolDetailView(
                 onDismiss = { isConfirmDialogShow.value = false },
                 onConfirm = {
                     isConfirmDialogShow.value = false
-                    markAsDonePatrol.invoke(data.id)
+                    markAsDonePatrol.invoke(data.patrolId)
                 })
         }
     }
@@ -228,16 +232,6 @@ fun PatrolDetailView(
                     Icon(
                         painter = rememberVectorPainter(image = Octicons.Sync24),
                         contentDescription = "Muat ulang"
-                    )
-                }
-            }
-            if (data.status == PatrolStatus.SEDANG_DIJALANKAN) PlainTooltipBox(tooltip = { Text(text = "Tambah") }) {
-                IconButton(
-                    onClick = { navigateToAddEvent(data.id) }, modifier = Modifier.tooltipAnchor()
-                ) {
-                    Icon(
-                        painter = rememberVectorPainter(image = Octicons.Plus24),
-                        contentDescription = "Tambah"
                     )
                 }
             }
@@ -269,15 +263,19 @@ fun PatrolDetailView(
                 }
 
                 item {
-                    Box(modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
                         ExpandableCard(title = "Daftar Kejadian", content = {
                             if (isEventLoading) {
-                                CircularProgressIndicator(modifier = Modifier
-                                    .size(45.dp)
-                                    .align(Alignment.CenterHorizontally))
-                            } else if(events.isNotEmpty()){
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(45.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            } else if (events.isNotEmpty()) {
                                 events.forEach {
                                     EventItem(data = it, onItemClick = { item ->
                                         navigateToDetailEvent.invoke(
@@ -288,28 +286,33 @@ fun PatrolDetailView(
                                     Spacer(modifier = Modifier.height(8.dp))
                                 }
                             } else {
-                                Text(text = "Data tidak tersedia", modifier = Modifier.align(Alignment.CenterHorizontally))
+                                Text(
+                                    text = "Data tidak tersedia",
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
                             }
                         }, defaultExpandedValue = true)
                     }
                 }
             }
-            if (userEmail == data.lead && data.status == PatrolStatus.SEDANG_DIJALANKAN) {
-                Card(
+            if (data.status == PatrolStatus.SEDANG_DIJALANKAN) {
+                ElevatedCard(
                     modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(
-                        topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
-                    ), colors = CardDefaults.cardColors(containerColor = Color.White)
+                        topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 0.dp
+                    ), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.elevatedCardElevation(8.dp)
                 ) {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp)
+                            .padding(24.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(
-                            onClick = { isConfirmDialogShow.value = true },
-                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { navigateToAddEvent(data.patrolId) },
+                            modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                            contentPadding = PaddingValues(16.dp),
+                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp),
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -317,7 +320,7 @@ fun PatrolDetailView(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Selesaikan patroli",
+                                    text = "Tambah Kejadian",
                                     style = TextStyle(fontSize = 16.sp, color = Color.White)
                                 )
                                 Box(
@@ -327,12 +330,27 @@ fun PatrolDetailView(
                                         .padding(4.dp)
                                 ) {
                                     Icon(
-                                        painter = rememberVectorPainter(image = Octicons.ArrowRight24),
-                                        contentDescription = "Icon Selesaikan",
+                                        painter = rememberVectorPainter(image = Octicons.Plus24),
+                                        contentDescription = "Tambah Kejadian",
                                         modifier = Modifier.size(16.dp),
                                         tint = Secondary
                                     )
                                 }
+                            }
+                        }
+                        if (data.lead.equals(userEmail)) {
+                            IconButton(
+                                onClick = { isConfirmDialogShow.value = true },
+                                modifier = Modifier.clip(CircleShape),
+                                colors = IconButtonDefaults.iconButtonColors(containerColor = DarkGreen),
+
+                            ) {
+                                Icon(
+                                    painter = rememberVectorPainter(image = Octicons.Check24),
+                                    contentDescription = "Selesaikan Patroli",
+                                    modifier = Modifier,
+                                    tint = Color.White,
+                                )
                             }
                         }
                     }
@@ -385,8 +403,8 @@ fun HeaderCard(
                         top.linkTo(parent.top, 16.dp)
                     }
                     .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                fontSize = 12.sp)
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                fontSize = 12.sp, color = Secondary)
             Text(
                 text = title, modifier = Modifier.constrainAs(titleConst) {
                     start.linkTo(parent.start, 16.dp)
@@ -483,13 +501,54 @@ fun HeaderCard(
     }
 }
 
+@Preview(showSystemUi = true, name = "Detail patrol with lead")
+@Composable
+fun PatrolDetailPreviewWithLead() {
+    EPatrolTheme {
+        PatrolDetailView(
+            state = UiState.Success(
+                PatrolDetailModel(
+                    0, 2, "Patroli pengamanan tindak kriminal",
+                    "sedang-dikerjakan",
+                    "Sprin/131/I/PAM.6.2.2/2020",
+                    "1 November 2023",
+                    "23:00",
+                    "Gunung simping",
+                    "budi@gmail.com"
+                )
+            ),
+            onNavUp = {},
+            userEmail = "budi@gmail.com",
+            navigateToAddEvent = {},
+            navigateToDetailEvent = { _, _ -> },
+            confirmState = null,
+            markAsDonePatrol = {},
+            onCompleteSuccess = {},
+            onRefresh = {},
+            eventState = UiState.Success(
+                listOf(
+                    PatrolEventModel(
+                        0,
+                        "Pencegahan tindak kriminal",
+                        "Patroli rutin",
+                        "Pengamanan pemuda",
+                        "3 Juli 2020",
+                        "budi@gmail.com"
+                    )
+                )
+            )
+        )
+    }
+}
+
 @Preview(showSystemUi = true)
 @Composable
 fun PatrolDetailPreview() {
     EPatrolTheme {
-        PatrolDetailView(state = UiState.Loading,
+        PatrolDetailView(
+            state = UiState.Loading,
             onNavUp = {},
-            userEmail = "budi@gmail.com",
+            userEmail = "budi2@gmail.com",
             navigateToAddEvent = {},
             navigateToDetailEvent = { _, _ -> },
             confirmState = null,

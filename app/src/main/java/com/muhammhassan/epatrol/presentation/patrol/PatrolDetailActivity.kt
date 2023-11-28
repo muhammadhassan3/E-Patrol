@@ -22,7 +22,7 @@ class PatrolDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra(id, 0)
-        viewModel.patrolId = id
+        viewModel.orderId = id
         viewModel.getDetail()
         setContent {
             EPatrolTheme {
@@ -58,7 +58,6 @@ class PatrolDetailActivity : ComponentActivity() {
 
     private fun navigateToDetailEvent(data: PatrolEventModel, removable: Boolean) {
         val intent = Intent(this, EventDetailActivity::class.java)
-        intent.putExtra(EventDetailActivity.patrolId, viewModel.patrolId)
         intent.putExtra(EventDetailActivity.removable, removable)
         intent.putExtra(EventDetailActivity.eventId, data.id)
         startActivity(intent)

@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.presentation.auth.AuthActivity
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
@@ -75,7 +74,6 @@ class MainActivity : ComponentActivity() {
 
     private fun navigate() {
         runBlocking {
-            delay(1200)
             startActivity(Intent(this@MainActivity, AuthActivity::class.java))
             finish()
         }

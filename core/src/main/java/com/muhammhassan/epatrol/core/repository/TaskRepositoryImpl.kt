@@ -14,6 +14,10 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
         return remoteDataSource.getTaskList()
     }
 
+    override suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> {
+        return remoteDataSource.getCompletedTaskList()
+    }
+
     override suspend fun verifyPatrolTask(id: Long): Flow<ApiResponse<Nothing>> {
         return remoteDataSource.verifyPatrol(id)
     }
@@ -31,9 +35,9 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
     }
 
     override suspend fun deletePatrolEvent(
-        patrolId: Long, eventId: Long
+        eventId: Long
     ): Flow<ApiResponse<Nothing>> {
-        return remoteDataSource.deletePatrolEvent(patrolId, eventId)
+        return remoteDataSource.deletePatrolEvent(eventId)
     }
 
     override suspend fun addPatrolEvent(
@@ -44,7 +48,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
         image: File,
         latitude: Double,
         longitude: Double,
-        authorName: String
+        authorName: String,
+        date: String
     ): Flow<ApiResponse<Nothing>> {
         return remoteDataSource.addPatrolEvent(
             patrolId,
@@ -54,7 +59,8 @@ class TaskRepositoryImpl(private val remoteDataSource: RemoteDataSource) : TaskR
             image,
             latitude,
             longitude,
-            authorName
+            authorName,
+            date
         )
     }
 

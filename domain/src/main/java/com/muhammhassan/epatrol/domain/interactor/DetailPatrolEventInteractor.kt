@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class DetailPatrolEventInteractor(
-    private val user: UserRepository,
-    private val task: TaskRepository
+    private val user: UserRepository, private val task: TaskRepository
 ) : DetailPatrolEventUseCase {
-    override suspend fun deleteEvent(patrolId: Long, eventId: Long): Flow<UiState<Nothing>> {
-        return task.deletePatrolEvent(patrolId, eventId).map {
+    override suspend fun deleteEvent(eventId: Long): Flow<UiState<Nothing>> {
+        return task.deletePatrolEvent(eventId).map {
             it.mapToUiState { data ->
                 data
             }
@@ -29,7 +28,7 @@ class DetailPatrolEventInteractor(
 
     override suspend fun getEventDetail(eventId: Long): Flow<UiState<EventDetailModel>> {
         return task.getEventDetail(eventId).map {
-            it.mapToUiState {data ->
+            it.mapToUiState { data ->
                 EventDetailModel(
                     id = data.id,
                     title = data.title,
@@ -43,6 +42,10 @@ class DetailPatrolEventInteractor(
                 )
             }
         }
+    }
+
+    override suspend fun getSavedToken(): Flow<String?> {
+        return user.getToken()
     }
 
 }

@@ -27,6 +27,10 @@ class UserRepositoryImpl(private val remote: RemoteDataSource, private val local
         return local.getEmail()
     }
 
+    override fun getToken(): Flow<String?> {
+        return local.getToken()
+    }
+
     override suspend fun clear() {
         local.clearLocal()
     }

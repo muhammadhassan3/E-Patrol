@@ -1,16 +1,19 @@
 package com.muhammhassan.epatrol.presentation.patrol.event.add
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.usecase.AddEventUseCase
-import com.muhammhassan.epatrol.utils.uriToFile
+import com.muhammhassan.epatrol.utils.reduceFileImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
     var patrolId = 0L
@@ -53,25 +56,43 @@ class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
         getUser()
     }
 
-    fun save(context: Context) {
+    fun save() {
         viewModelScope.launch {
-            if(latitude == 0.0 || longitude == 0.0){
-                _state.value = UiState.Error("Data lokasi tidak ditemukan, silahkan coba beberapa saat lagi")
+            _state.value = UiState.Loading
+            if (latitude == 0.0 || longitude == 0.0) {
+                _state.value =
+                    UiState.Error("Data lokasi tidak ditemukan, silahkan coba beberapa saat lagi")
                 return@launch
             }
-            if(!arrayOf(action.value.trim(), event.value.trim(), summary.value.trim()).all { it.isNotEmpty() }){
-                _state.value = UiState.Error("Pastikan semua kolom sudah terisi ya")
+
+            if(image.value == null){
+                _state.value = UiState.Error("Silahkan upload gambar terlebih dahulu")
+                return@launch
             }
+
+            if (!arrayOf(
+                    action.value.trim(),
+                    event.value.trim(),
+                    summary.value.trim()
+                ).all { it.isNotEmpty() }
+            ) {
+                _state.value = UiState.Error("Pastikan semua kolom sudah terisi ya")
+                return@launch
+            }
+            val dateFormater = SimpleDateFormat("yyyy-MM-dd", Locale("id", "ID"))
+            val calendar = Calendar.getInstance()
+            val date = dateFormater.format(calendar.time)
             if (image.value != null) {
                 useCase.addEvent(
                     patrolId = patrolId,
                     event = event.value,
                     summary = summary.value,
                     action = action.value,
-                    image = uriToFile(image.value!!, context),
+                    image = reduceFileImage(File(image.value!!.path!!)),
                     lat = latitude,
                     long = longitude,
-                    authorName = name
+                    authorName = name,
+                    date = date
                 ).collect {
                     _state.value = it
                 }
@@ -79,7 +100,7 @@ class AddEventViewModel(private val useCase: AddEventUseCase) : ViewModel() {
         }
     }
 
-    private fun getUser(){
+    private fun getUser() {
         viewModelScope.launch {
             val user = useCase.getUser().first()
             name = user.name

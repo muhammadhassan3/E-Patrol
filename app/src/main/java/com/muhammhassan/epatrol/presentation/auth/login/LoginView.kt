@@ -1,7 +1,6 @@
 package com.muhammhassan.epatrol.presentation.auth.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -10,7 +9,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -42,13 +40,11 @@ import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
-import com.muhammhassan.epatrol.ui.theme.Secondary
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
     onResponseSuccess: () -> Unit,
@@ -106,7 +102,7 @@ fun LoginView(
     }
 
     ConstraintLayout(modifier = modifier.fillMaxSize()) {
-        val (icon, title, subtitle, edtEmail, edtPassword, forgetPassword, btnMasuk, layoutRegister, loading) = createRefs()
+        val (icon, title, subtitle, edtEmail, edtPassword, btnMasuk, loading) = createRefs()
         Image(
             painter = painterResource(id = R.drawable.app_icon),
             contentDescription = "Application Icon",
@@ -161,7 +157,8 @@ fun LoginView(
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Primary,
-                )
+                ),
+                singleLine = true
             )
             OutlinedTextField(value = password,
                 onValueChange = viewModel::setPassword,
@@ -192,18 +189,19 @@ fun LoginView(
                     }
                 }, keyboardActions = KeyboardActions(onSend = {
                     viewModel.login()
-                })
+                }),
+                singleLine = true
             )
-            Text(text = "Lupa Password?", modifier = Modifier.constrainAs(forgetPassword) {
-                end.linkTo(parent.end, 16.dp)
-                top.linkTo(edtPassword.bottom, 8.dp)
-            }, fontWeight = FontWeight.Medium, color = Primary)
+//            Text(text = "Lupa Password?", modifier = Modifier.constrainAs(forgetPassword) {
+//                end.linkTo(parent.end, 16.dp)
+//                top.linkTo(edtPassword.bottom, 8.dp)
+//            }, fontWeight = FontWeight.Medium, color = Primary)
             Button(
                 onClick = viewModel::login,
                 modifier = Modifier.constrainAs(btnMasuk) {
                     start.linkTo(parent.start, 16.dp)
                     end.linkTo(parent.end, 16.dp)
-                    bottom.linkTo(layoutRegister.top, 8.dp)
+                    bottom.linkTo(parent.bottom, 16.dp)
                     width = Dimension.fillToConstraints
                     height = Dimension.value(45.dp)
                 },
@@ -218,19 +216,19 @@ fun LoginView(
                 )
             }
 
-            Row(modifier = Modifier.constrainAs(layoutRegister) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom, 16.dp)
-            }) {
-                Text(
-                    text = "Belum punya akun? ",
-                    modifier = Modifier,
-                    color = Color.DarkGray,
-                    fontSize = 14.sp
-                )
-                Text(text = "Daftar", modifier = Modifier, color = Secondary, fontSize = 14.sp)
-            }
+//            Row(modifier = Modifier.constrainAs(layoutRegister) {
+//                start.linkTo(parent.start)
+//                end.linkTo(parent.end)
+//                bottom.linkTo(parent.bottom, 16.dp)
+//            }) {
+//                Text(
+//                    text = "Belum punya akun? ",
+//                    modifier = Modifier,
+//                    color = Color.DarkGray,
+//                    fontSize = 14.sp
+//                )
+//                Text(text = "Daftar", modifier = Modifier, color = Secondary, fontSize = 14.sp)
+//            }
         }
     }
 }

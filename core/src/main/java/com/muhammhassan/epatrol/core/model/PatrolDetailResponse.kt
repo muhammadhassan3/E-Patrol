@@ -12,16 +12,17 @@ data class PatrolDetailResponse(
     @SerializedName("lokasi") val alamat: String,
     @SerializedName("tgl_pelaksanaan") private val tglPelaksanaan: String,
     @SerializedName("waktu_mulai") val jam: String,
-    @SerializedName("email") val ketua: String,
-    private val verified: Int,
+    @SerializedName("ketua_regu") private val ketuaRaw: UserModel,
     val id: Long,
+    @SerializedName("patroli_id")  val patrolId: Long,
     @SerializedName("no_polisi") val plate: String,
     @SerializedName("no_sprin") private val rawSprin: Int
 ) {
+    val ketua: String get() = ketuaRaw.email ?: ""
     val judul: String
         get() {
             val numberFormatter = DecimalFormat("00000000")
-            return "Patroli-${numberFormatter.format(id)}"
+            return "Patroli-${numberFormatter.format((id.toString()+patrolId.toString()).toInt())}"
         }
 
     val sprin: String

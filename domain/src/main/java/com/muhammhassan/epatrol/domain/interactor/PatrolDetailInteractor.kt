@@ -17,14 +17,15 @@ class PatrolDetailInteractor(
         return task.getDetailPatrol(id).map {
             it.mapToUiState { data ->
                 PatrolDetailModel(
-                    data.id,
-                    data.judul,
-                    data.status,
-                    data.sprin,
-                    data.tanggal,
-                    data.jam,
-                    data.alamat,
-                    lead = data.ketua
+                    id = data.id,
+                    title = data.judul,
+                    status = data.status,
+                    sprin = data.sprin,
+                    tanggal = data.tanggal,
+                    jam = data.jam,
+                    tujuan = data.alamat,
+                    lead = data.ketua,
+                    patrolId = data.patrolId
                 )
             }
         }

@@ -19,9 +19,10 @@ class AddEventInteractor(private val task: TaskRepository, private val user: Use
         image: File,
         lat: Double,
         long: Double,
-        authorName: String
+        authorName: String,
+        date: String
     ): Flow<UiState<Nothing>> {
-        return task.addPatrolEvent(patrolId, event, summary, action, image, lat, long, authorName).map {
+        return task.addPatrolEvent(patrolId, event, summary, action, image, lat, long, authorName, date).map {
             it.mapToUiState { body ->
                 body
             }
