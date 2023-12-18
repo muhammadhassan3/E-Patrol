@@ -11,4 +11,7 @@ interface LocalDataSource {
     fun getEmail(): Flow<String?>
 
     suspend fun clearLocal()
+
+    suspend fun setSubsToGlobalChannel(value: Boolean)
+    fun isSubsToGlobalChannel(): Flow<Boolean>
 }

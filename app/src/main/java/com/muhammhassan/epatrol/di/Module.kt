@@ -4,6 +4,7 @@ import com.muhammhassan.epatrol.presentation.auth.login.LoginViewModel
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardViewModel
 import com.muhammhassan.epatrol.presentation.home.profile.ProfileViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListViewModel
+import com.muhammhassan.epatrol.presentation.main.MainViewModel
 import com.muhammhassan.epatrol.presentation.patrol.PatrolDetailViewModel
 import com.muhammhassan.epatrol.presentation.patrol.event.EventDetailViewModel
 import com.muhammhassan.epatrol.presentation.patrol.event.add.AddEventViewModel
@@ -19,5 +20,6 @@ object Module {
         viewModel { EventDetailViewModel(get()) }
         viewModel { AddEventViewModel(get()) }
         viewModel { ProfileViewModel(get()) }
+        viewModel { MainViewModel(get()) }
     }
 }

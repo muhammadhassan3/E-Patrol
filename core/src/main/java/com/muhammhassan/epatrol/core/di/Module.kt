@@ -12,6 +12,8 @@ import com.muhammhassan.epatrol.core.datasource.local.datastore.DataStorePrefere
 import com.muhammhassan.epatrol.core.datasource.remote.RemoteDataSource
 import com.muhammhassan.epatrol.core.datasource.remote.RemoteDataSourceImpl
 import com.muhammhassan.epatrol.core.datasource.remote.api.ApiInterface
+import com.muhammhassan.epatrol.core.repository.NotificationRepository
+import com.muhammhassan.epatrol.core.repository.NotificationRepositoryImpl
 import com.muhammhassan.epatrol.core.repository.TaskRepository
 import com.muhammhassan.epatrol.core.repository.TaskRepositoryImpl
 import com.muhammhassan.epatrol.core.repository.UserRepository
@@ -45,11 +47,11 @@ object Module {
             requestBuilder.addHeader("version", version.toString())
             val request = requestBuilder.build()
             it.proceed(request)
-        }.addInterceptor{
+        }.addInterceptor {
             val requestBuilder = it.request().newBuilder()
             runBlocking {
                 val token = dataStore.getToken().first()
-                if(token!= null && !it.request().url.encodedPath.endsWith("auth")){
+                if (token != null && !it.request().url.encodedPath.endsWith("auth")) {
                     requestBuilder.addHeader("Authorization", "Bearer $token")
                 }
             }
@@ -71,5 +73,6 @@ object Module {
     val repositoryModule = module {
         single<UserRepository> { UserRepositoryImpl(get(), get()) }
         single<TaskRepository> { TaskRepositoryImpl(get()) }
+        single<NotificationRepository> { NotificationRepositoryImpl(get()) }
     }
 }

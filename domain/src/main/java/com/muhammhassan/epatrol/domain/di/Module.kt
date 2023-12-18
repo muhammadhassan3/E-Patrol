@@ -8,6 +8,7 @@ import com.muhammhassan.epatrol.domain.interactor.AddEventInteractor
 import com.muhammhassan.epatrol.domain.interactor.DashboardInteractor
 import com.muhammhassan.epatrol.domain.interactor.DetailPatrolEventInteractor
 import com.muhammhassan.epatrol.domain.interactor.LoginInteractor
+import com.muhammhassan.epatrol.domain.interactor.MainInteractor
 import com.muhammhassan.epatrol.domain.interactor.PatrolDetailInteractor
 import com.muhammhassan.epatrol.domain.interactor.ProfileInteractor
 import com.muhammhassan.epatrol.domain.interactor.TaskListInteractor
@@ -15,6 +16,7 @@ import com.muhammhassan.epatrol.domain.usecase.AddEventUseCase
 import com.muhammhassan.epatrol.domain.usecase.DashboardUseCase
 import com.muhammhassan.epatrol.domain.usecase.DetailPatrolEventUseCase
 import com.muhammhassan.epatrol.domain.usecase.LoginUseCase
+import com.muhammhassan.epatrol.domain.usecase.MainUseCase
 import com.muhammhassan.epatrol.domain.usecase.PatrolDetailUseCase
 import com.muhammhassan.epatrol.domain.usecase.ProfileUseCase
 import com.muhammhassan.epatrol.domain.usecase.TaskListUseCase
@@ -29,6 +31,7 @@ object Module {
         single<DetailPatrolEventUseCase> { DetailPatrolEventInteractor(get(), get()) }
         single<AddEventUseCase> { AddEventInteractor(get(), get()) }
         single<ProfileUseCase> { ProfileInteractor(get()) }
+        single<MainUseCase> { MainInteractor(get()) }
     }
 
     fun retrofit(version: Int) = retrofitModule(version)

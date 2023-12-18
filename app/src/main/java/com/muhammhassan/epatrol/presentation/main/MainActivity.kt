@@ -14,9 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.presentation.auth.AuthActivity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModel<MainViewModel>()
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
@@ -36,8 +39,21 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition {
             true
         }
+
         super.onCreate(savedInstanceState)
+        /**
+         *  Create Notification channel for andorid O and above
+         */
         initiateNotificationChannel()
+
+        /**
+         * Manage Push Notification channel
+         */
+        manageSubsChannel()
+
+        /**
+         * Check Notification permission
+         */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -71,11 +87,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
+    /**
+     *  Navigate to login page
+     */
     private fun navigate() {
         runBlocking {
+            delay(800)
             startActivity(Intent(this@MainActivity, AuthActivity::class.java))
             finish()
+        }
+    }
+
+    private fun manageSubsChannel() {
+        viewModel.isSubsGlobalChannel.observe(this){
+            if(!it){
+                viewModel.subsToGlobalChannel()
+            }
         }
     }
 }

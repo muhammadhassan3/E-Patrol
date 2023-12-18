@@ -2,6 +2,7 @@ package com.muhammhassan.epatrol.core.datasource.local.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.muhammhassan.epatrol.core.model.UserModel
@@ -50,6 +51,18 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
         }
     }
 
+    fun getSubscribedToGlobalChannel(): Flow<Boolean>{
+        return datastore.data.map {
+            it[SUBS_TO_GLOBAL_CHANNEL] ?: false
+        }
+    }
+
+    suspend fun setSubscribedToGlobalChannel(value: Boolean){
+        datastore.edit {
+            it[SUBS_TO_GLOBAL_CHANNEL] = value
+        }
+    }
+
     companion object{
         val EMAIL = stringPreferencesKey("email")
         val NAME = stringPreferencesKey("name")
@@ -57,5 +70,6 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
         val JABATAN = stringPreferencesKey("jabatan")
         val PROFILE = stringPreferencesKey("profile")
         val TOKEN = stringPreferencesKey("token")
+        val SUBS_TO_GLOBAL_CHANNEL = booleanPreferencesKey("subsToGlobalChannel")
     }
 }

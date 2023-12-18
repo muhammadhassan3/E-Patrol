@@ -30,4 +30,12 @@ class LocalDataSourceImpl(private val datastore: DataStorePreferences) : LocalDa
     override suspend fun clearLocal() {
         datastore.clear()
     }
+
+    override suspend fun setSubsToGlobalChannel(value: Boolean) {
+        datastore.setSubscribedToGlobalChannel(value)
+    }
+
+    override fun isSubsToGlobalChannel(): Flow<Boolean> {
+        return datastore.getSubscribedToGlobalChannel()
+    }
 }
