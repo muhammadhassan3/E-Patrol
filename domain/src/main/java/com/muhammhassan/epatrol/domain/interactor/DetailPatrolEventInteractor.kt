@@ -36,7 +36,7 @@ class DetailPatrolEventInteractor(
                     author = data.author,
                     action = data.action,
                     summary = data.summary,
-                    long = data.long,
+                    long = data.lon,
                     lat = data.lat,
                     image = data.image
                 )

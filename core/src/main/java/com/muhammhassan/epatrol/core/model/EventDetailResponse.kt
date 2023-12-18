@@ -15,7 +15,7 @@ data class EventDetailResponse(
     @SerializedName("latitude")
     val lat: Double,
     @SerializedName("longitude")
-    val long: Double,
+    val lon: Double,
     @SerializedName("tgl_kejadian")
     val createdAt: String,
     @SerializedName("writer")
