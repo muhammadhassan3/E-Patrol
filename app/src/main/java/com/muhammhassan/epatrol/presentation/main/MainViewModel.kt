@@ -15,7 +15,11 @@ class MainViewModel(private val useCase: MainUseCase) : ViewModel() {
 
     private val messages = FirebaseMessaging.getInstance()
 
-    fun isSubscribedToGlobalChannel() {
+    init {
+        isSubscribedToGlobalChannel()
+    }
+
+    private fun isSubscribedToGlobalChannel() {
         viewModelScope.launch {
             val value = useCase.isSubsToGlobalChannel().first()
             _isSubsGlobalChannel.postValue(value)
@@ -24,13 +28,13 @@ class MainViewModel(private val useCase: MainUseCase) : ViewModel() {
 
     fun subsToGlobalChannel(){
         messages.subscribeToTopic("/general").addOnSuccessListener {
-            setSubscribedToGlobalChannel(true)
+            setSubscribedToGlobalChannel()
         }
     }
 
-    private fun setSubscribedToGlobalChannel(value: Boolean) {
+    private fun setSubscribedToGlobalChannel() {
         viewModelScope.launch {
-            useCase.setSubsToGlobalChannel(value)
+            useCase.setSubsToGlobalChannel(true)
         }
     }
 }
