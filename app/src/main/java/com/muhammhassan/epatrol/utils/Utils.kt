@@ -25,7 +25,6 @@ fun getDisplayStatus(statusCode: String): String = when (statusCode) {
     "sudah-dikerjakan" -> "Sudah dikerjakan"
     else -> "Status tidak tersedia"
 }
-//TODO : Implement this function to all page
 fun Context.doReloginEvent(){
     Toast.makeText(this, "Silahkan masuk kembali", Toast.LENGTH_SHORT).show()
     val intent = Intent(this, AuthActivity::class.java).also{
