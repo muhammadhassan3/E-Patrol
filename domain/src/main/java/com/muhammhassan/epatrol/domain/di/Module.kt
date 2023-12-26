@@ -26,7 +26,7 @@ import org.koin.dsl.module
 
 object Module {
     val useCaseModule = module {
-        single<LoginUseCase> { LoginInteractor(get()) }
+        single<LoginUseCase> { LoginInteractor(get(), get()) }
         single<DashboardUseCase> { DashboardInteractor(get(), get()) }
         single<TaskListUseCase> { TaskListInteractor(get(), get()) }
         single<PatrolDetailUseCase> { PatrolDetailInteractor(get(), get()) }

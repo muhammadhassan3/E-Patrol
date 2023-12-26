@@ -8,11 +8,22 @@ import com.muhammhassan.epatrol.core.model.UserModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserRepositoryImpl(private val remote: RemoteDataSource, private val local: LocalDataSource): UserRepository {
-    override suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>> {
-        return remote.login(email, password).map {
-            if(it is ApiResponse.Success && it.data != null){
-                local.setUser(email = it.data.user.email ?: "", nrp = it.data.user.nrp ?: "", nama = it.data.user.name ?: "", jabatan = it.data.user.jabatan ?: "", profileUrl = it.data.user.profile ?: "")
+class UserRepositoryImpl(private val remote: RemoteDataSource, private val local: LocalDataSource) :
+    UserRepository {
+    override suspend fun login(
+        email: String,
+        password: String,
+        token: String?
+    ): Flow<ApiResponse<LoginResponse>> {
+        return remote.login(email, password, token).map {
+            if (it is ApiResponse.Success && it.data != null) {
+                local.setUser(
+                    email = it.data.user.email ?: "",
+                    nrp = it.data.user.nrp ?: "",
+                    nama = it.data.user.name ?: "",
+                    jabatan = it.data.user.jabatan ?: "",
+                    profileUrl = it.data.user.profile ?: ""
+                )
                 local.setToken(it.data.token)
             }
             it

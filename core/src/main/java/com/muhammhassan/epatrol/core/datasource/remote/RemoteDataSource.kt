@@ -10,7 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface RemoteDataSource {
-    suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>>
+    suspend fun login(
+        email: String,
+        password: String,
+        token: String?
+    ): Flow<ApiResponse<LoginResponse>>
 
     suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>
     suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>>

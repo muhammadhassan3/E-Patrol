@@ -19,10 +19,14 @@ import timber.log.Timber
 import java.io.File
 
 class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
-    override suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>> =
+    override suspend fun login(
+        email: String,
+        password: String,
+        token: String?
+    ): Flow<ApiResponse<LoginResponse>> =
         flow {
             emit(ApiResponse.Loading)
-            val response = api.login(email, password)
+            val response = api.login(email, password, token)
             if (response.isSuccessful) {
                 response.body()?.data?.let {
                     emit(ApiResponse.Success(it))

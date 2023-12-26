@@ -6,7 +6,11 @@ import com.muhammhassan.epatrol.core.model.UserModel
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun login(email: String, password: String): Flow<ApiResponse<LoginResponse>>
+    suspend fun login(
+        email: String,
+        password: String,
+        token: String?
+    ): Flow<ApiResponse<LoginResponse>>
 
     fun getUser(): Flow<UserModel>
     fun getEmail(): Flow<String?>

@@ -8,4 +8,6 @@ interface NotificationRepository {
 
     suspend fun setToken(value: String)
 
+    fun getToken(): Flow<String?>
+
 }

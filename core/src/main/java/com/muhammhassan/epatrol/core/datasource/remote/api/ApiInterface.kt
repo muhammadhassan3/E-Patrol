@@ -24,7 +24,9 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST("auth")
     suspend fun login(
-        @Field("email") email: String, @Field("password") password: String
+        @Field("email") email: String,
+        @Field("password") password: String,
+        @Field("token") token: String?
     ): Response<BaseResponse<LoginResponse>>
 
     @GET("patroli/list")

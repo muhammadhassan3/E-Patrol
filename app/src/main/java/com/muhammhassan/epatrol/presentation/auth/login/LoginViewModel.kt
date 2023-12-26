@@ -43,7 +43,8 @@ class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
         }
 
         viewModelScope.launch {
-            useCase.login(email.value, password.value).collect {
+            val token = useCase.getToken().firstOrNull()
+            useCase.login(email.value, password.value, token).collect {
                 _state.value = it
             }
         }
