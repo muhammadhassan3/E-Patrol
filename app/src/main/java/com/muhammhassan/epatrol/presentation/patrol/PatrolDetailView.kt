@@ -338,7 +338,7 @@ fun PatrolDetailView(
                                 }
                             }
                         }
-                        if (data.lead.equals(userEmail)) {
+                        if (data.lead == userEmail) {
                             IconButton(
                                 onClick = { isConfirmDialogShow.value = true },
                                 modifier = Modifier.clip(CircleShape),
