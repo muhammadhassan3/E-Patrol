@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -40,6 +41,7 @@ import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
@@ -53,6 +55,8 @@ fun LoginView(
     val viewModel = koinViewModel<LoginViewModel>()
     val email by viewModel.email.collectAsStateWithLifecycle()
     val password by viewModel.password.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
 
     val isPasswordShow = remember { mutableStateOf(false) }
     val isLoading = remember {
@@ -83,6 +87,8 @@ fun LoginView(
                 isLoading.value = false
                 onResponseSuccess.invoke()
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
 
             null -> {}
         }

@@ -58,6 +58,7 @@ import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.utils.PatrolStatus
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.Bell24
 import compose.icons.octicons.Person24
@@ -141,8 +142,9 @@ fun DashboardView(
                         it
                     )
                 }
-
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
         }
     })
 
@@ -165,6 +167,8 @@ fun DashboardView(
             }
 
             null -> {}
+
+            is UiState.NeedLogin -> context.doReloginEvent()
         }
     })
 

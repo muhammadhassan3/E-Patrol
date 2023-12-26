@@ -32,6 +32,7 @@ import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.utils.PatrolStatus
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -102,8 +103,10 @@ fun TaskListView(
                         it
                     )
                 }
-
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 
@@ -126,6 +129,9 @@ fun TaskListView(
             }
 
             null -> {}
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 

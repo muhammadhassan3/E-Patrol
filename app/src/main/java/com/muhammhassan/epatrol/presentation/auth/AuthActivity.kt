@@ -2,6 +2,7 @@ package com.muhammhassan.epatrol.presentation.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,10 @@ import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 
 class AuthActivity : ComponentActivity() {
 
+    private val toMainMenu by lazy{
+        intent.getBooleanExtra(TO_MAIN_MENU, true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -27,7 +32,16 @@ class AuthActivity : ComponentActivity() {
                 ) {
                     LoginView(
                         onResponseSuccess = {
-                            navigateToMainMenu()
+                            if(toMainMenu){
+                                navigateToMainMenu()
+                            }else{
+                                Toast.makeText(
+                                    this@AuthActivity,
+                                    "Silahkan ulangi permintaanmu",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                finish()
+                            }
                         }
                     )
                 }
@@ -38,5 +52,9 @@ class AuthActivity : ComponentActivity() {
     private fun navigateToMainMenu() {
         startActivity(Intent(this@AuthActivity, HomeActivity::class.java))
         finish()
+    }
+
+    companion object{
+        const val TO_MAIN_MENU = "to_main_menu"
     }
 }

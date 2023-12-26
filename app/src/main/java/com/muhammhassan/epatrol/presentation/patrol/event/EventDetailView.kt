@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,6 +50,7 @@ import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Clock24
@@ -67,6 +69,7 @@ fun EventDetailView(
     showLocationOnMap: (lat: Double, long: Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val data = remember {
         mutableStateOf<EventDetailModel?>(null)
@@ -103,6 +106,9 @@ fun EventDetailView(
                 isLoading.value = false
                 data.value = uiState.data
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 
@@ -125,6 +131,9 @@ fun EventDetailView(
             }
 
             null -> {}
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 

@@ -20,28 +20,10 @@ import java.io.File
 
 class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
     override suspend fun login(
-        email: String,
-        password: String,
-        token: String?
-    ): Flow<ApiResponse<LoginResponse>> =
-        flow {
-            emit(ApiResponse.Loading)
-            val response = api.login(email, password, token)
-            if (response.isSuccessful) {
-                response.body()?.data?.let {
-                    emit(ApiResponse.Success(it))
-                }
-            } else {
-                emit(ApiResponse.Error(response.parseError()))
-            }
-        }.catch { error ->
-            Timber.e(error)
-            emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
-        }
-
-    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> = flow {
+        email: String, password: String, token: String?
+    ): Flow<ApiResponse<LoginResponse>> = flow {
         emit(ApiResponse.Loading)
-        val response = api.getPatrolTask()
+        val response = api.login(email, password, token)
         if (response.isSuccessful) {
             response.body()?.data?.let {
                 emit(ApiResponse.Success(it))
@@ -54,20 +36,40 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
 
-    override suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> = flow {
+    override suspend fun getTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> = flow {
         emit(ApiResponse.Loading)
-        val response = api.getCompletedPatrolTask()
-        if(response.isSuccessful){
+        val response = api.getPatrolTask()
+        if (response.isSuccessful) {
             response.body()?.data?.let {
                 emit(ApiResponse.Success(it))
             }
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }
-    }.catch {
-        Timber.e(it)
+    }.catch { error ->
+        Timber.e(error)
         emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
     }
+
+    override suspend fun getCompletedTaskList(): Flow<ApiResponse<List<PatrolItemResponse>>> =
+        flow {
+            emit(ApiResponse.Loading)
+            val response = api.getCompletedPatrolTask()
+            if (response.isSuccessful) {
+                response.body()?.data?.let {
+                    emit(ApiResponse.Success(it))
+                }
+            } else if (response.code() == 401) {
+                emit(ApiResponse.NeedLogin)
+            } else {
+                emit(ApiResponse.Error(response.parseError()))
+            }
+        }.catch {
+            Timber.e(it)
+            emit(ApiResponse.Error(NETWORK_FAILURE_MESSAGE))
+        }
 
     override suspend fun getTaskEventList(patrolId: Long): Flow<ApiResponse<List<PatrolEventData>>> =
         flow {
@@ -77,6 +79,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
                 response.body()?.data?.let {
                     emit(ApiResponse.Success(it))
                 }
+            } else if (response.code() == 401) {
+                emit(ApiResponse.NeedLogin)
             } else {
                 emit(
                     if (response.code() == 404) ApiResponse.Success(
@@ -100,6 +104,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
                 response.body()?.data?.let {
                     emit(ApiResponse.Success(it))
                 }
+            } else if (response.code() == 401) {
+                emit(ApiResponse.NeedLogin)
             } else {
                 emit(ApiResponse.Error(response.parseError()))
             }
@@ -113,6 +119,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val response = api.verifyPatrol(id)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }
@@ -126,6 +134,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val response = api.getPatrolDetail(id)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(response.body()?.data))
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }
@@ -141,6 +151,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val response = api.deleteEvent(eventId)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }
@@ -188,6 +200,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
 
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }
@@ -201,6 +215,8 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val response = api.markAsDonePatrol(patrolId)
         if (response.isSuccessful) {
             emit(ApiResponse.Success(null))
+        } else if (response.code() == 401) {
+            emit(ApiResponse.NeedLogin)
         } else {
             emit(ApiResponse.Error(response.parseError()))
         }

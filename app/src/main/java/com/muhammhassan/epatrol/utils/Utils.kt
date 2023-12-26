@@ -2,12 +2,15 @@ package com.muhammhassan.epatrol.utils
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
+import com.muhammhassan.epatrol.presentation.auth.AuthActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -20,8 +23,16 @@ fun getDisplayStatus(statusCode: String): String = when (statusCode) {
     "belum-dikerjakan" -> "Belum dikerjakan"
     "sedang-dikerjakan" -> "Sedang berjalan"
     "sudah-dikerjakan" -> "Sudah dikerjakan"
-//    else -> throw IllegalArgumentException("Invalid status code : $statusCode")
     else -> "Status tidak tersedia"
+}
+//TODO : Implement this function to all page
+fun Context.doReloginEvent(){
+    Toast.makeText(this, "Silahkan masuk kembali", Toast.LENGTH_SHORT).show()
+    val intent = Intent(this, AuthActivity::class.java).also{
+        it.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        it.putExtra(AuthActivity.TO_MAIN_MENU, false)
+    }
+    startActivity(intent)
 }
 
 private const val FILENAME_FORMAT = "dd-MMM-yyyy"

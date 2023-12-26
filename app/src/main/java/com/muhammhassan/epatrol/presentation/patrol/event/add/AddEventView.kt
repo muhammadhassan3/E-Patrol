@@ -45,6 +45,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +59,7 @@ import com.muhammhassan.epatrol.component.LoadingDialog
 import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Secondary
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
 import compose.icons.octicons.Image24
@@ -79,6 +81,7 @@ fun AddEventView(
     onResponseSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val isLoading = remember {
         mutableStateOf(false)
     }
@@ -131,6 +134,9 @@ fun AddEventView(
             }
 
             null -> {}
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 

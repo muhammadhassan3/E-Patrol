@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,6 +70,7 @@ import com.muhammhassan.epatrol.ui.theme.DarkGreen
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Secondary
 import com.muhammhassan.epatrol.utils.PatrolStatus
+import com.muhammhassan.epatrol.utils.doReloginEvent
 import com.muhammhassan.epatrol.utils.getDisplayStatus
 import compose.icons.Octicons
 import compose.icons.octicons.ArrowLeft24
@@ -108,6 +110,8 @@ fun PatrolDetailView(
             )
         )
     }
+
+    val context = LocalContext.current
 
     val events = remember {
         mutableStateListOf<PatrolEventModel>()
@@ -149,6 +153,8 @@ fun PatrolDetailView(
                 setLoading(false)
                 state.data?.let { setData(it) }
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
         }
     })
 
@@ -169,6 +175,9 @@ fun PatrolDetailView(
                 events.clear()
                 eventState.data?.let { events.addAll(it) }
             }
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 
@@ -190,6 +199,9 @@ fun PatrolDetailView(
             }
 
             null -> {}
+
+            is UiState.NeedLogin -> context.doReloginEvent()
+
         }
     })
 
