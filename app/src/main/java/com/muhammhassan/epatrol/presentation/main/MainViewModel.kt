@@ -8,6 +8,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.muhammhassan.epatrol.domain.usecase.MainUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainViewModel(private val useCase: MainUseCase) : ViewModel() {
     private val _isSubsGlobalChannel = MutableLiveData<Boolean>()
@@ -27,8 +28,11 @@ class MainViewModel(private val useCase: MainUseCase) : ViewModel() {
     }
 
     fun subsToGlobalChannel(){
-        messages.subscribeToTopic("/general").addOnSuccessListener {
+        messages.subscribeToTopic("general").addOnSuccessListener {
+            Timber.i("Channel #0 Subscribed")
             setSubscribedToGlobalChannel()
+        }.addOnFailureListener {
+            Timber.e("Channel #0 failed to subscribe : ${it.message}")
         }
     }
 
