@@ -9,6 +9,10 @@ class NotificationRepositoryImpl(private val local: LocalDataSource): Notificati
     }
 
     override suspend fun setSubsToGlobalChannel(value: Boolean){
-        local::setSubsToGlobalChannel
+        local.setSubsToGlobalChannel(value)
+    }
+
+    override suspend fun setToken(value: String) {
+        local.setToken(value)
     }
 }

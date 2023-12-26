@@ -6,12 +6,22 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.muhammhassan.epatrol.R
+import com.muhammhassan.epatrol.domain.usecase.NotificationServiceUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
-class FirebaseService : FirebaseMessagingService() {
+class FirebaseService : FirebaseMessagingService(), KoinComponent {
+    private val notif: NotificationServiceUseCase by inject()
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Timber.e(token)
+        CoroutineScope(Dispatchers.IO).launch {
+            notif.setToken(token)
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
