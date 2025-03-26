@@ -22,10 +22,12 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -191,10 +193,13 @@ fun EventDetailView(
             }
         }, actions = {
             data.value?.let { data ->
-                PlainTooltipBox(tooltip = { Text(text = "Lihat lokasi") }) {
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                    tooltip = { Text(text = "Lihat lokasi") },
+                    state = rememberTooltipState()) {
                     IconButton(onClick = {
                         showLocationOnMap.invoke(data.lat, data.long)
-                    }, modifier = Modifier.tooltipAnchor()) {
+                    }, modifier = Modifier) {
                         Icon(
                             painter = rememberVectorPainter(image = Octicons.Location24),
                             contentDescription = "Lihat Location"
@@ -228,8 +233,7 @@ fun EventDetailView(
                             .padding(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             Icon(
                                 painter = rememberVectorPainter(image = Octicons.Clock24),

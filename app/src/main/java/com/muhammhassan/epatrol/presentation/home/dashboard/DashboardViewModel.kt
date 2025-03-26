@@ -7,6 +7,7 @@ import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.domain.usecase.DashboardUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -16,8 +17,6 @@ class DashboardViewModel(private val useCase: DashboardUseCase): ViewModel()
     private val _taskList = MutableStateFlow<UiState<List<PatrolModel>>>(UiState.Loading)
     val taskList = _taskList.asStateFlow()
 
-    private val _verifyState = MutableStateFlow<UiState<Nothing>?>(null)
-    val verifyState = _verifyState.asStateFlow()
 
     private val _user = MutableStateFlow(UserModel("Gagal memuat data user", "","", "", ""))
     val user = _user.asStateFlow()
@@ -40,11 +39,14 @@ class DashboardViewModel(private val useCase: DashboardUseCase): ViewModel()
         }
     }
 
-    fun verifyPatrol(id: Long){
+    fun verifyPatrol(id: Long): StateFlow<UiState<Nothing?>>{
+        val state = MutableStateFlow<UiState<Nothing?>>(UiState.Loading)
         viewModelScope.launch {
             useCase.verifyPatrolTask(id).collect{
-                _verifyState.value = it
+                state.value = it
             }
         }
+
+        return state
     }
 }

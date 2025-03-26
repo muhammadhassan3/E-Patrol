@@ -27,6 +27,14 @@ class LocalDataSourceImpl(private val datastore: DataStorePreferences) : LocalDa
         return datastore.getEmail()
     }
 
+    override suspend fun setFcmToken(token: String) {
+        datastore.setFcmToken(token)
+    }
+
+    override fun getFcmToken(): Flow<String?> {
+        return datastore.getFcmToken()
+    }
+
     override suspend fun clearLocal() {
         datastore.clear()
     }

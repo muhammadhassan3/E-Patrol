@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -39,13 +40,17 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.domain.model.UiState
+import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Primary
 import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun LoginView(
@@ -69,14 +74,18 @@ fun LoginView(
         mutableStateOf(false)
     }
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = remember {
+        mutableStateOf<UiState<UserModel>?>(null)
+    }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = state, block = {
-        when (state) {
+    LaunchedEffect(key1 = state.value, block = {
+        when (state.value) {
             is UiState.Error -> {
                 isLoading.value = false
-                dialogData.value = (state as UiState.Error).message
+                dialogData.value = (state.value as UiState.Error).message
                 isDialogShow.value = true
+                state.value = null
             }
 
             UiState.Loading -> {
@@ -86,6 +95,7 @@ fun LoginView(
             is UiState.Success -> {
                 isLoading.value = false
                 onResponseSuccess.invoke()
+                state.value = null
             }
 
             is UiState.NeedLogin -> context.doReloginEvent()
@@ -194,6 +204,11 @@ fun LoginView(
                         )
                     }
                 }, keyboardActions = KeyboardActions(onSend = {
+                    scope.launch {
+                        viewModel.login().collect{
+                            state.value = it
+                        }
+                    }
                     viewModel.login()
                 }),
                 singleLine = true
@@ -203,7 +218,13 @@ fun LoginView(
 //                top.linkTo(edtPassword.bottom, 8.dp)
 //            }, fontWeight = FontWeight.Medium, color = Primary)
             Button(
-                onClick = viewModel::login,
+                onClick = {
+                    scope.launch {
+                        viewModel.login().collect {
+                            state.value = it
+                        }
+                    }
+                },
                 modifier = Modifier.constrainAs(btnMasuk) {
                     start.linkTo(parent.start, 16.dp)
                     end.linkTo(parent.end, 16.dp)

@@ -26,7 +26,7 @@ interface ApiInterface {
     suspend fun login(
         @Field("email") email: String,
         @Field("password") password: String,
-        @Field("token") token: String?
+        @Field("fcm_token") token: String?
     ): Response<BaseResponse<LoginResponse>>
 
     @GET("patroli/list")

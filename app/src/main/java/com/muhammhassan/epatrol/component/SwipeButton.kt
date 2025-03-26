@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
@@ -46,42 +47,42 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeButton(enabled: Boolean, onSwipe: () -> Unit, modifier: Modifier = Modifier) {
-    val swipeState = rememberSwipeableState(initialValue = 0)
     val width = 308.dp
-    val widthInPx =
-        with(LocalDensity.current) {
-            width.toPx()
-        }
+    val swipeState = rememberSwipeableState(initialValue = 0)
+    val density = LocalDensity.current
+    val widthInPx = with(density) {
+        width.toPx()
+    }
+    val anchors = mapOf(0f to 0, widthInPx to 1)
 
-    val anchor = mapOf(0f to 0, widthInPx to 1)
-    val (swipeComplete, setSwipeComplete) = remember{
+
+    val (swipeComplete, setSwipeComplete) = remember {
         mutableStateOf(false)
     }
     val alpha: Float by animateFloatAsState(
         targetValue = if (swipeComplete) {
             0f
-        }else{
+        } else {
             1f
-        },
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = LinearEasing
+        }, animationSpec = tween(
+            durationMillis = 300, easing = LinearEasing
         ), label = "Alpha"
     )
 
     val textAlpha by animateFloatAsState(
-        targetValue = (1f-(swipeState.offset.value/1078)),
+        targetValue = 1f - swipeState.offset.value / 1078,
         visibilityThreshold = 0.3f,
         label = "Text Alpha"
     )
 
     LaunchedEffect(key1 = swipeState.currentValue, block = {
-        if(swipeState.currentValue == 1){
+        if (swipeState.currentValue == 1) {
             setSwipeComplete(true)
             onSwipe.invoke()
         }
     })
-    if (enabled){
+
+    if (enabled) {
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(100))
@@ -92,37 +93,45 @@ fun SwipeButton(enabled: Boolean, onSwipe: () -> Unit, modifier: Modifier = Modi
             SwipeIndicator(modifier = Modifier
                 .alpha(alpha)
                 .padding(8.dp)
-                .swipeable(
-                    state = swipeState,
-                    anchors = anchor,
+                .offset {
+                    IntOffset(
+                        swipeState.offset.value.roundToInt(), 0
+                    )
+                }
+                .swipeable(state = swipeState,
+                    anchors = anchors,
                     orientation = Orientation.Horizontal,
-                    thresholds = { _, _ -> FractionalThreshold(0.3f) })
-                .offset { IntOffset(swipeState.offset.value.roundToInt(), 0) }
-            )
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) }))
             Text(
                 text = "Geser untuk melakukan verfikasi",
                 modifier = Modifier
                     .align(Alignment.Center)
                     .alpha(textAlpha),
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White
+                )
             )
         }
-    }else{
+    } else {
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(100))
                 .background(color = Color.Gray)
                 .fillMaxWidth()
         ) {
-            SwipeIndicator(modifier = Modifier
-                .alpha(0f)
-                .padding(8.dp))
+            SwipeIndicator(
+                modifier = Modifier
+                    .alpha(0f)
+                    .padding(8.dp)
+            )
             Text(
                 text = "Silahkan pastikan semua sudah diperiksa",
                 modifier = Modifier
                     .align(Alignment.Center)
                     .alpha(textAlpha),
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White
+                )
             )
         }
     }
@@ -130,10 +139,11 @@ fun SwipeButton(enabled: Boolean, onSwipe: () -> Unit, modifier: Modifier = Modi
 
 @Composable
 fun SwipeIndicator(modifier: Modifier = Modifier) {
-    Box(modifier = modifier
-        .clip(CircleShape)
-        .background(color = Color.White)
-        .size(42.dp)
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(color = Color.White)
+            .size(42.dp)
     ) {
         Icon(
             painter = rememberVectorPainter(image = Octicons.ChevronRight24),
@@ -150,6 +160,7 @@ fun SwipeButtonPreview() {
         SwipeButton(enabled = true, onSwipe = {})
     }
 }
+
 @Preview(showSystemUi = false)
 @Composable
 fun DisabledSwipeButtonPreview() {

@@ -7,9 +7,11 @@ import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.domain.usecase.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
     private val _email = MutableStateFlow("")
@@ -18,8 +20,6 @@ class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
 
-    private val _state = MutableStateFlow<UiState<UserModel>?>(null)
-    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -36,17 +36,20 @@ class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
         _password.value = value
     }
 
-    fun login() {
+    fun login(): StateFlow<UiState<UserModel>?> {
+        val state = MutableStateFlow<UiState<UserModel>>(UiState.Loading)
         if (!PatternsCompat.EMAIL_ADDRESS.matcher(email.value).matches()) {
-            _state.value = UiState.Error("Silahkan masukkan email yang valid")
-            return
+            state.value = UiState.Error("Silahkan masukkan email yang valid")
+            return state
         }
 
         viewModelScope.launch {
             val token = useCase.getToken().firstOrNull()
             useCase.login(email.value, password.value, token).collect {
-                _state.value = it
+                state.value = it
             }
         }
+
+        return state
     }
 }

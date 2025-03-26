@@ -39,6 +39,18 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
         }
     }
 
+    suspend fun setFcmToken(token: String){
+        datastore.edit {
+            it[FCM_TOKEN] = token
+        }
+    }
+
+    fun getFcmToken(): Flow<String?>{
+        return datastore.data.map {
+            it[FCM_TOKEN]
+        }
+    }
+
     fun getEmail(): Flow<String?>{
         return datastore.data.map {
             it[EMAIL]
@@ -47,7 +59,12 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
 
     suspend fun clear(){
         datastore.edit {
-            it.clear()
+            it.remove(EMAIL)
+            it.remove(NAME)
+            it.remove(NRP)
+            it.remove(JABATAN)
+            it.remove(PROFILE)
+            it.remove(TOKEN)
         }
     }
 
@@ -70,6 +87,7 @@ class DataStorePreferences(private val datastore: DataStore<Preferences>) {
         val JABATAN = stringPreferencesKey("jabatan")
         val PROFILE = stringPreferencesKey("profile")
         val TOKEN = stringPreferencesKey("token")
+        val FCM_TOKEN = stringPreferencesKey("fcm_token")
         val SUBS_TO_GLOBAL_CHANNEL = booleanPreferencesKey("subsToGlobalChannel")
     }
 }

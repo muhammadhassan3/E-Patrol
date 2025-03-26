@@ -10,6 +10,9 @@ interface LocalDataSource {
     fun getToken(): Flow<String?>
     fun getEmail(): Flow<String?>
 
+    suspend fun setFcmToken(token: String)
+    fun getFcmToken(): Flow<String?>
+
     suspend fun clearLocal()
 
     suspend fun setSubsToGlobalChannel(value: Boolean)

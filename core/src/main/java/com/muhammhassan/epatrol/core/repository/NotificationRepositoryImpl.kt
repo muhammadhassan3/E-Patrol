@@ -13,10 +13,10 @@ class NotificationRepositoryImpl(private val local: LocalDataSource) : Notificat
     }
 
     override suspend fun setToken(value: String) {
-        local.setToken(value)
+        local.setFcmToken(value)
     }
 
     override fun getToken(): Flow<String?> {
-        return local.getToken()
+        return local.getFcmToken()
     }
 }

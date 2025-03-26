@@ -14,6 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,7 +55,7 @@ fun ConfirmDialogView(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp)
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Divider()
+            HorizontalDivider()
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = message,

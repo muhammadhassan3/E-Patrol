@@ -27,6 +27,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,22 +65,23 @@ import compose.icons.Octicons
 import compose.icons.octicons.Bell24
 import compose.icons.octicons.Person24
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun DashboardView(
-    uiState: UiState<List<PatrolModel>>,
-    verifyState: UiState<Nothing>?,
-    user: UserModel,
     onProfileClicked: () -> Unit,
     onNotificationClicked: () -> Unit,
     navigateToDetailPage: (patrolId: Long) -> Unit,
-    verifyUser: (id: Long) -> Unit,
-    onRefreshTriggered: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: DashboardViewModel = koinViewModel()
 ) {
+
+    val uiState by viewModel.taskList.collectAsState()
+    val user by viewModel.user.collectAsState()
+
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
@@ -100,7 +103,9 @@ fun DashboardView(
         mutableStateOf("")
     }
     val pullRefreshState =
-        rememberPullRefreshState(refreshing = swipeLoading.value, onRefresh = onRefreshTriggered)
+        rememberPullRefreshState(refreshing = swipeLoading.value, onRefresh = {
+            viewModel.getTask()
+        })
     val (selectedOrderId, setSelectedOrderId) = remember {
         mutableLongStateOf(0L)
     }
@@ -126,7 +131,7 @@ fun DashboardView(
         when (uiState) {
             is UiState.Error -> {
                 swipeLoading.value = false
-                dialogMessage.value = uiState.message
+                dialogMessage.value = (uiState as UiState.Error).message
                 isDialogShow.value = true
             }
 
@@ -137,36 +142,12 @@ fun DashboardView(
             is UiState.Success -> {
                 swipeLoading.value = false
                 listData.clear()
-                uiState.data?.let {
+                (uiState as UiState.Success<List<PatrolModel>>).data?.let {
                     listData.addAll(
                         it
                     )
                 }
             }
-
-            is UiState.NeedLogin -> context.doReloginEvent()
-        }
-    })
-
-    LaunchedEffect(key1 = verifyState, block = {
-        when (verifyState) {
-            is UiState.Error -> {
-                isLoading.value = false
-                dialogMessage.value = verifyState.message
-                isDialogShow.value = true
-            }
-
-            UiState.Loading -> {
-                isLoading.value = true
-            }
-
-            is UiState.Success -> {
-                isLoading.value = false
-                navigateToDetailPage.invoke(selectedOrderId)
-                Toast.makeText(context, "Tugas terverifikasi", Toast.LENGTH_SHORT).show()
-            }
-
-            null -> {}
 
             is UiState.NeedLogin -> context.doReloginEvent()
         }
@@ -180,7 +161,29 @@ fun DashboardView(
             VerifyBottomSheetView(plate = selectedPlate, onSwipe = {
                 scope.launch { sheetState.hide() }
                 isSheetShow.value = false
-                verifyUser.invoke(selectedPatrolId.longValue)
+                scope.launch {
+                    viewModel.verifyPatrol(selectedPatrolId.longValue).collect{
+                        when (it) {
+                            is UiState.Error -> {
+                                isLoading.value = false
+                                dialogMessage.value = it.message
+                                isDialogShow.value = true
+                            }
+
+                            UiState.Loading -> {
+                                isLoading.value = true
+                            }
+
+                            is UiState.Success -> {
+                                isLoading.value = false
+                                navigateToDetailPage.invoke(selectedOrderId)
+                                Toast.makeText(context, "Tugas terverifikasi", Toast.LENGTH_SHORT).show()
+                            }
+
+                            is UiState.NeedLogin -> context.doReloginEvent()
+                        }
+                    }
+                }
             })
         }
     }
@@ -295,29 +298,10 @@ fun DashboardView(
 @Composable
 fun DashboardPreview() {
     EPatrolTheme {
-        DashboardView(uiState = UiState.Success(
-            listOf(
-                PatrolModel(
-                    1, 2,
-                    "belum-dikerjakan",
-                    "jalan jalan",
-                    "17 agustus 2020",
-                    "07:00",
-                    "ade@email.co",
-                    false,
-                    "Jl juanda",
-                    "R 0000 PH",
-
-                    )
-            )
-        ),
-            user = UserModel("Doni Salamander", "", "", "", ""),
+        DashboardView(
             onProfileClicked = {},
             navigateToDetailPage = {},
             onNotificationClicked = {},
-            onRefreshTriggered = {},
-            verifyUser = {},
-            verifyState = null
         )
     }
 }
