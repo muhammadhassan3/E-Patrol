@@ -4,17 +4,18 @@ import android.Manifest
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.common.api.ResolvableApiException
@@ -26,7 +27,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.muhammhassan.epatrol.utils.camera.CameraActivity
-import com.muhammhassan.epatrol.utils.createCustomTempFile
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.io.File
@@ -79,8 +79,10 @@ class AddEventActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
                 val data = it.data?.getStringExtra(CameraActivity.URI)
-                val uri = Uri.parse(data)
-                viewModel.setImage(uri)
+                val uri = data?.toUri()
+                uri?.let {
+                    viewModel.setImage(uri)
+                }
             }
         }
     private val cameraPermissionCallback =
@@ -116,6 +118,9 @@ class AddEventActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(Color.Transparent.toArgb(), Color.Transparent.toArgb())
+        )
         val patrolId = intent.getLongExtra(patrolId, 0L)
         viewModel.patrolId = patrolId
         setContent {
@@ -146,21 +151,6 @@ class AddEventActivity : ComponentActivity() {
         setResult(RESULT_OK)
         Toast.makeText(this, "Kejadian berhasil ditambahkan", Toast.LENGTH_SHORT).show()
         finish()
-    }
-
-    private fun openIntentCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.resolveActivity(packageManager)
-
-        createCustomTempFile(applicationContext).also {
-            val photoUri = FileProvider.getUriForFile(
-                this, "com.muhammhassan.epatrol", it
-            )
-
-            currentPath = it.absolutePath
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-            cameraLauncher.launch(intent)
-        }
     }
 
     private fun initCamera() {

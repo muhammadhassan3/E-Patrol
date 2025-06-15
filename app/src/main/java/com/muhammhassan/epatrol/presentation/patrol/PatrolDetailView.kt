@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
@@ -213,7 +213,8 @@ fun PatrolDetailView(
 
     if (isConfirmDialogShow.value) {
         Dialog(onDismissRequest = { isConfirmDialogShow.value }) {
-            ConfirmDialogView(message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
+            ConfirmDialogView(
+                message = "Apakah kamu ingin menyelesaikan tugas patroli ini?",
                 onDismiss = { isConfirmDialogShow.value = false },
                 onConfirm = {
                     isConfirmDialogShow.value = false
@@ -222,7 +223,8 @@ fun PatrolDetailView(
         }
     }
 
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
+    Column(modifier = modifier.fillMaxSize()) {
+
         TopAppBar(title = { Text(text = "Detail Patroli") }, modifier = Modifier, navigationIcon = {
             IconButton(onClick = onNavUp) {
                 Icon(
@@ -246,10 +248,8 @@ fun PatrolDetailView(
                 }
             }
         })
-    }) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
         ) {
             LazyColumn(
@@ -317,7 +317,8 @@ fun PatrolDetailView(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
+                            .padding(24.dp)
+                            .navigationBarsPadding(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -409,7 +410,8 @@ fun HeaderCard(
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (statusConst, titleConst, sprinConst, footerConst, iconCalendar, calendarConst, iconTime, timeConst) = createRefs()
             val verticalGuideline = createGuidelineFromStart(0.8f)
-            Text(text = getDisplayStatus(status),
+            Text(
+                text = getDisplayStatus(status),
                 modifier = Modifier
                     .constrainAs(statusConst) {
                         start.linkTo(parent.start, 16.dp)
@@ -519,7 +521,8 @@ fun HeaderCard(
 @Composable
 fun PatrolDetailPreviewWithLead() {
     EPatrolTheme {
-        PatrolDetailView(state = UiState.Success(
+        PatrolDetailView(
+            state = UiState.Success(
             PatrolDetailModel(
                 0,
                 2,
@@ -560,7 +563,8 @@ fun PatrolDetailPreviewWithLead() {
 @Composable
 fun PatrolDetailPreview() {
     EPatrolTheme {
-        PatrolDetailView(state = UiState.Loading,
+        PatrolDetailView(
+            state = UiState.Loading,
             onNavUp = {},
             userEmail = "budi2@gmail.com",
             navigateToAddEvent = {},

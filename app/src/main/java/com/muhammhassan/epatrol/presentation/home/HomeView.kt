@@ -1,6 +1,5 @@
 package com.muhammhassan.epatrol.presentation.home
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
@@ -12,7 +11,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,9 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.muhammhassan.epatrol.domain.model.UiState
 import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardView
-import com.muhammhassan.epatrol.presentation.home.dashboard.DashboardViewModel
 import com.muhammhassan.epatrol.presentation.home.profile.ProfileView
 import com.muhammhassan.epatrol.presentation.home.profile.ProfileViewModel
 import com.muhammhassan.epatrol.presentation.home.task.TaskListView
@@ -40,12 +36,10 @@ import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.ui.theme.Tertiary10
 import com.muhammhassan.epatrol.utils.NavigationItem
 import com.muhammhassan.epatrol.utils.Screen
-import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.Home24
 import compose.icons.octicons.Note24
 import compose.icons.octicons.Person24
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +58,7 @@ fun HomeView(
 
     val backStack = navController.currentBackStackEntryAsState()
     val route = backStack.value?.destination?.route
-    val scope = rememberCoroutineScope()
+    rememberCoroutineScope()
     Scaffold(modifier = modifier, bottomBar = {
         val currentStack by navController.currentBackStackEntryAsState()
         val currentRoute = currentStack?.destination?.route

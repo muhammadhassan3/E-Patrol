@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +44,8 @@ fun VerifyBottomSheetView(plate: String, onSwipe: () -> Unit, modifier: Modifier
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 60.dp)
+            .padding(vertical = 16.dp)
+            .navigationBarsPadding()
     ) {
         val (labelPlate, labelFirearms, labelEquipment, labelHandcuffs, swipeButton) = createRefs()
         SwitchLabel(title = "Kendaraan dengan nomor\n$plate",
@@ -113,7 +115,7 @@ fun SwitchLabel(
             Switch(
                 checked = state,
                 onCheckedChange = onStateChanged,
-                colors = SwitchDefaults.colors(checkedTrackColor = Green)
+                colors = SwitchDefaults.colors(checkedTrackColor = Green, uncheckedTrackColor = Color.White)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(

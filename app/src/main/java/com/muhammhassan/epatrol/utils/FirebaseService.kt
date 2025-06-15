@@ -3,10 +3,8 @@ package com.muhammhassan.epatrol.utils
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.media.Ringtone
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
-import androidx.core.app.PendingIntentCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.muhammhassan.epatrol.R
@@ -18,7 +16,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 class FirebaseService : FirebaseMessagingService(), KoinComponent {
     private val notif: NotificationServiceUseCase by inject()

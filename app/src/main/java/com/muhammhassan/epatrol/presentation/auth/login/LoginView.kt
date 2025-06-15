@@ -2,6 +2,9 @@ package com.muhammhassan.epatrol.presentation.auth.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -47,10 +50,8 @@ import com.muhammhassan.epatrol.utils.doReloginEvent
 import compose.icons.Octicons
 import compose.icons.octicons.Eye24
 import compose.icons.octicons.EyeClosed24
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @Composable
 fun LoginView(
@@ -117,7 +118,7 @@ fun LoginView(
         })
     }
 
-    ConstraintLayout(modifier = modifier.fillMaxSize()) {
+    ConstraintLayout(modifier = modifier.fillMaxSize().navigationBarsPadding().statusBarsPadding()) {
         val (icon, title, subtitle, edtEmail, edtPassword, btnMasuk, loading) = createRefs()
         Image(
             painter = painterResource(id = R.drawable.app_icon),
@@ -213,10 +214,6 @@ fun LoginView(
                 }),
                 singleLine = true
             )
-//            Text(text = "Lupa Password?", modifier = Modifier.constrainAs(forgetPassword) {
-//                end.linkTo(parent.end, 16.dp)
-//                top.linkTo(edtPassword.bottom, 8.dp)
-//            }, fontWeight = FontWeight.Medium, color = Primary)
             Button(
                 onClick = {
                     scope.launch {
@@ -242,20 +239,6 @@ fun LoginView(
                     color = Color.White
                 )
             }
-
-//            Row(modifier = Modifier.constrainAs(layoutRegister) {
-//                start.linkTo(parent.start)
-//                end.linkTo(parent.end)
-//                bottom.linkTo(parent.bottom, 16.dp)
-//            }) {
-//                Text(
-//                    text = "Belum punya akun? ",
-//                    modifier = Modifier,
-//                    color = Color.DarkGray,
-//                    fontSize = 14.sp
-//                )
-//                Text(text = "Daftar", modifier = Modifier, color = Secondary, fontSize = 14.sp)
-//            }
         }
     }
 }

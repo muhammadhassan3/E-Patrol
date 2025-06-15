@@ -1,12 +1,10 @@
 package com.muhammhassan.epatrol.utils
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
@@ -14,8 +12,6 @@ import com.muhammhassan.epatrol.presentation.auth.AuthActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 

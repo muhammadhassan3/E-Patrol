@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -141,7 +142,9 @@ fun AddEventView(
     })
 
 
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
+    Column(
+        modifier = Modifier.fillMaxSize().navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         CenterAlignedTopAppBar(title = {
             Text(
                 text = "Tambah Kejadian",
@@ -155,155 +158,147 @@ fun AddEventView(
                 )
             }
         }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White))
-    }) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
+        Card(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Card(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Column(
+                Text(
+                    text = "Kejadian",
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = event,
+                    onValueChange = eventChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "Tuliskan kejadian yang kamu temukan",
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                    },
+                    singleLine = false,
+                    maxLines = 3,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        summaryFocus.requestFocus()
+                    }),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Deskripsi Singkat",
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = summary,
+                    onValueChange = summaryChanged,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Kejadian",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = event,
-                        onValueChange = eventChanged,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                text = "Tuliskan kejadian yang kamu temukan",
-                                modifier = Modifier,
-                                style = TextStyle(fontSize = 12.sp)
-                            )
-                        },
-                        singleLine = false,
-                        maxLines = 3,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
-                        ),
-                        keyboardActions = KeyboardActions(onNext = {
-                            summaryFocus.requestFocus()
-                        }),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Deskripsi Singkat",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = summary,
-                        onValueChange = summaryChanged,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(summaryFocus)
-                            .onFocusChanged { if (it.isFocused) keyboardController?.show() },
-                        placeholder = {
-                            Text(
-                                text = "Berikan deskripsi singkat kejadian",
-                                modifier = Modifier,
-                                style = TextStyle(fontSize = 12.sp)
-                            )
-                        },
-                        singleLine = false,
-                        maxLines = 3,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
+                        .focusRequester(summaryFocus)
+                        .onFocusChanged { if (it.isFocused) keyboardController?.show() },
+                    placeholder = {
+                        Text(
+                            text = "Berikan deskripsi singkat kejadian",
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp)
                         )
+                    },
+                    singleLine = false,
+                    maxLines = 3,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Tindakan yang dilakukan",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = action,
-                        onValueChange = actionChanged,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                text = "Tuliskan tindakan yang dilakukan",
-                                modifier = Modifier,
-                                style = TextStyle(fontSize = 12.sp)
-                            )
-                        },
-                        singleLine = false,
-                        maxLines = 3,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tindakan yang dilakukan",
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = action,
+                    onValueChange = actionChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "Tuliskan tindakan yang dilakukan",
+                            modifier = Modifier,
+                            style = TextStyle(fontSize = 12.sp)
                         )
+                    },
+                    singleLine = false,
+                    maxLines = 3,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.LightGray, focusedBorderColor = Secondary
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Gambar",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Box(modifier = Modifier
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Gambar",
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Box(
+                    modifier = Modifier
                         .fillMaxWidth()
                         .height(128.dp)
                         .border(2.dp, Color.Gray, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color.LightGray)
                         .clickable { onCaptureImage.invoke() }) {
-                        if (image == null || image.toString() == "") {
+                    if (image == null || image.toString() == "") {
 
-                            Column(
-                                modifier = Modifier.align(Alignment.Center),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    painter = rememberVectorPainter(image = Octicons.Image24),
-                                    contentDescription = "Icon",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = Secondary
-                                )
-                                Text(text = "Pilih Gambar", style = TextStyle(color = Secondary))
-                            }
-                        } else {
-                            AsyncImage(
-                                model = image,
-                                contentDescription = "Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                painter = rememberVectorPainter(image = Octicons.Image24),
+                                contentDescription = "Icon",
+                                modifier = Modifier.size(24.dp),
+                                tint = Secondary
                             )
+                            Text(text = "Pilih Gambar", style = TextStyle(color = Secondary))
                         }
+                    } else {
+                        AsyncImage(
+                            model = image,
+                            contentDescription = "Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(), shape = RoundedCornerShape(
-                    topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
-                ),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Box(modifier = Modifier.padding(24.dp)) {
-                    Button(
-                        onClick = onSubmit,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                        contentPadding = PaddingValues(16.dp)
-                    ) {
-                        Text(text = "Tambah Kejadian", style = TextStyle(fontSize = 16.sp))
-                    }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Card(
+            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(
+                topStart = 16.dp, topEnd = 16.dp, bottomEnd = 0.dp, bottomStart = 16.dp
+            ), colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Box(modifier = Modifier.padding(24.dp)) {
+                Button(
+                    onClick = onSubmit,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Secondary),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    Text(text = "Tambah Kejadian", style = TextStyle(fontSize = 16.sp))
                 }
             }
         }
@@ -314,7 +309,8 @@ fun AddEventView(
 @Composable
 fun AddEventPreview() {
     EPatrolTheme {
-        AddEventView(onNavUp = { /*TODO*/ },
+        AddEventView(
+            onNavUp = { /*TODO*/ },
             onCaptureImage = { /*TODO*/ },
             image = "".toUri(),
             action = "",

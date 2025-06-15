@@ -1,6 +1,7 @@
 package com.muhammhassan.epatrol.presentation.patrol.event
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -177,135 +178,136 @@ fun EventDetailView(
     if (isLoading.value) {
         LoadingDialog(onDismiss = { isLoading.value = false })
     }
-
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
-        CenterAlignedTopAppBar(title = {
-            Text(
-                text = "Detail Kejadian",
-                style = TextStyle(fontWeight = FontWeight.Black, fontSize = 18.sp)
-            )
-        }, modifier = Modifier, navigationIcon = {
-            IconButton(onClick = onNavUp) {
-                Icon(
-                    painter = rememberVectorPainter(image = Octicons.ArrowLeft24),
-                    contentDescription = "Kembali"
+    Box(modifier = Modifier.fillMaxSize()){
+        Scaffold(modifier = modifier.fillMaxSize(), topBar = {
+            CenterAlignedTopAppBar(title = {
+                Text(
+                    text = "Detail Kejadian",
+                    style = TextStyle(fontWeight = FontWeight.Black, fontSize = 18.sp)
                 )
-            }
-        }, actions = {
-            data.value?.let { data ->
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                    tooltip = { Text(text = "Lihat lokasi") },
-                    state = rememberTooltipState()) {
-                    IconButton(onClick = {
-                        showLocationOnMap.invoke(data.lat, data.long)
-                    }, modifier = Modifier) {
-                        Icon(
-                            painter = rememberVectorPainter(image = Octicons.Location24),
-                            contentDescription = "Lihat Location"
-                        )
-                    }
+            }, modifier = Modifier, navigationIcon = {
+                IconButton(onClick = onNavUp) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Octicons.ArrowLeft24),
+                        contentDescription = "Kembali"
+                    )
                 }
-            }
-        })
-    }) { padding ->
-        data.value?.let { data ->
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .verticalScroll(state = scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Timber.e(data.image)
-                AsyncImage("", data.image, modifier = Modifier.fillMaxWidth())
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
+            }, actions = {
+                data.value?.let { data ->
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = { Text(text = "Lihat lokasi") },
+                        state = rememberTooltipState()) {
+                        IconButton(onClick = {
+                            showLocationOnMap.invoke(data.lat, data.long)
+                        }, modifier = Modifier) {
                             Icon(
-                                painter = rememberVectorPainter(image = Octicons.Clock24),
-                                contentDescription = "Icon waktu",
-                                modifier = Modifier
-                                    .size(12.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
-                            Text(
-                                text = data.createdAt,
-                                modifier = Modifier,
-                                style = TextStyle(fontSize = 12.sp)
+                                painter = rememberVectorPainter(image = Octicons.Location24),
+                                contentDescription = "Lihat Location"
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = data.title,
-                            modifier = Modifier,
-                            style = TextStyle(fontWeight = FontWeight.Black, fontSize = 16.sp),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Deskripsi Kejadian",
-                            modifier = Modifier,
-                            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = data.summary,
-                            modifier = Modifier,
-                            style = TextStyle(fontSize = 12.sp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Tindakan yang dilakukan",
-                            modifier = Modifier,
-                            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = data.action,
-                            modifier = Modifier,
-                            style = TextStyle(fontSize = 12.sp)
-                        )
                     }
                 }
-                if (removable) {
-                    Spacer(modifier = Modifier.weight(1f))
+            })
+        }) { padding ->
+            data.value?.let { data ->
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize()
+                        .verticalScroll(state = scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Timber.e(data.image)
+                    AsyncImage("", data.image, modifier = Modifier.fillMaxWidth())
+                    Spacer(modifier = Modifier.height(8.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(
-                            topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp
-                        )
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(24.dp)
+                                .padding(12.dp)
                         ) {
-                            Button(
-                                onClick = { isConfirmDialogShow.value = true },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = Red20),
-                                contentPadding = PaddingValues(12.dp)
+                            Row(
+                                modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
-                                Text(
-                                    text = "Hapus Kejadian",
-                                    style = TextStyle(fontSize = 16.sp, color = Red)
+                                Icon(
+                                    painter = rememberVectorPainter(image = Octicons.Clock24),
+                                    contentDescription = "Icon waktu",
+                                    modifier = Modifier
+                                        .size(12.dp)
+                                        .align(Alignment.CenterVertically)
                                 )
+                                Text(
+                                    text = data.createdAt,
+                                    modifier = Modifier,
+                                    style = TextStyle(fontSize = 12.sp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = data.title,
+                                modifier = Modifier,
+                                style = TextStyle(fontWeight = FontWeight.Black, fontSize = 16.sp),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Deskripsi Kejadian",
+                                modifier = Modifier,
+                                style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = data.summary,
+                                modifier = Modifier,
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Tindakan yang dilakukan",
+                                modifier = Modifier,
+                                style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = data.action,
+                                modifier = Modifier,
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        }
+                    }
+                    if (removable) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(
+                                topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp)
+                            ) {
+                                Button(
+                                    onClick = { isConfirmDialogShow.value = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Red20),
+                                    contentPadding = PaddingValues(12.dp)
+                                ) {
+                                    Text(
+                                        text = "Hapus Kejadian",
+                                        style = TextStyle(fontSize = 16.sp, color = Red)
+                                    )
+                                }
                             }
                         }
                     }

@@ -6,25 +6,24 @@ plugins {
 apply from:'../shared_dependencies.gradle'
 android {
     namespace 'com.muhammhassan.epatrol.core'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 24
-        targetSdk 34
+        targetSdk 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        buildConfigField "String", "BASE_URL", '"https://epatrol.lumencode.cloud/api/"'
 
     }
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://si-patrol.xyz/api/"'
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BASE_URL", '"https://si-patrol.xyz/api/"'
         }
     }
     compileOptions {
@@ -41,9 +40,9 @@ android {
 
 dependencies {
     //room
-    implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.room:room-ktx:2.6.1'
-    ksp 'androidx.room:room-compiler:2.6.1'
+    implementation 'androidx.room:room-runtime:2.7.1'
+    implementation 'androidx.room:room-ktx:2.7.1'
+    ksp 'androidx.room:room-compiler:2.7.1'
 
     //retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
@@ -51,10 +50,10 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14'
 
     //datastore
-    implementation 'androidx.datastore:datastore-preferences:1.1.1'
+    implementation 'androidx.datastore:datastore-preferences:1.1.7'
     implementation 'androidx.preference:preference-ktx:1.2.1'
 
     //coroutine
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 }

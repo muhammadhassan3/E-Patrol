@@ -28,7 +28,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Module {
-    private val Context.datastore: DataStore<Preferences> by preferencesDataStore("patuhi_com")
+    private val Context.datastore: DataStore<Preferences> by preferencesDataStore("epatrol_com")
 
     val dataSourceModule = module {
         single<RemoteDataSource> { RemoteDataSourceImpl(get()) }

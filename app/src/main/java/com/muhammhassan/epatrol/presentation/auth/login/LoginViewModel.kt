@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class LoginViewModel(private val useCase: LoginUseCase) : ViewModel() {
     private val _email = MutableStateFlow("")

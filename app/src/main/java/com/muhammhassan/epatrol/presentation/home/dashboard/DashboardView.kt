@@ -57,7 +57,6 @@ import com.muhammhassan.epatrol.component.PatrolTaskList
 import com.muhammhassan.epatrol.component.VerifyBottomSheetView
 import com.muhammhassan.epatrol.domain.model.PatrolModel
 import com.muhammhassan.epatrol.domain.model.UiState
-import com.muhammhassan.epatrol.domain.model.UserModel
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import com.muhammhassan.epatrol.utils.PatrolStatus
 import com.muhammhassan.epatrol.utils.doReloginEvent
@@ -157,11 +156,13 @@ fun DashboardView(
         ModalBottomSheet(
             onDismissRequest = { isSheetShow.value = false },
             sheetState = sheetState,
+            dragHandle = {},
+            containerColor = Color.White,
         ) {
             VerifyBottomSheetView(plate = selectedPlate, onSwipe = {
-                scope.launch { sheetState.hide() }
-                isSheetShow.value = false
                 scope.launch {
+                    sheetState.hide()
+                    isSheetShow.value = false
                     viewModel.verifyPatrol(selectedPatrolId.longValue).collect{
                         when (it) {
                             is UiState.Error -> {

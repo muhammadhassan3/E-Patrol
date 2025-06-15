@@ -4,7 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
@@ -108,7 +107,7 @@ fun SwipeButton(enabled: Boolean, onSwipe: () -> Unit, modifier: Modifier = Modi
                     .align(Alignment.Center)
                     .alpha(textAlpha),
                 style = TextStyle(
-                    fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White
+                    fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White
                 )
             )
         }
@@ -130,7 +129,7 @@ fun SwipeButton(enabled: Boolean, onSwipe: () -> Unit, modifier: Modifier = Modi
                     .align(Alignment.Center)
                     .alpha(textAlpha),
                 style = TextStyle(
-                    fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White
+                    fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White
                 )
             )
         }

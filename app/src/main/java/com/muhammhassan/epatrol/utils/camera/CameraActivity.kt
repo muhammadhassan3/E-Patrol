@@ -6,9 +6,13 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ImageCapture
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.muhammhassan.epatrol.R
 import com.muhammhassan.epatrol.ui.theme.EPatrolTheme
 import java.io.File
@@ -21,6 +25,9 @@ class CameraActivity : ComponentActivity() {
     private val imageCapture = ImageCapture.Builder().build()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
+        )
         setContent {
             val imageCapture: ImageCapture = remember { this.imageCapture }
             EPatrolTheme {
