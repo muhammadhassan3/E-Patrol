@@ -180,6 +180,7 @@ class RemoteDataSourceImpl(private val api: ApiInterface) : RemoteDataSource {
         val longitudePart = long.toString().toRequestBody("text/plain".toMediaType())
         val authorPart = authorName.toRequestBody("text/plain".toMediaType())
         val imageFile = image.asRequestBody("image/jpeg".toMediaType())
+        Timber.e((image.length()/ 1024L).toString())
         val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
             "foto", image.name, imageFile
         )

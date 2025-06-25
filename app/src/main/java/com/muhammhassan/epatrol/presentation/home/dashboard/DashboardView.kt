@@ -277,7 +277,6 @@ fun DashboardView(
                     return@PatrolTaskList
                 }
                 if (it.lead == user.email) {
-                    scope.launch { sheetState.show() }
                     isSheetShow.value = true
                     setSelectedOrderId(it.id)
                     selectedPatrolId.longValue = it.patrolId

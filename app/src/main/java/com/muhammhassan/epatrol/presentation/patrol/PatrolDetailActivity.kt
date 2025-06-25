@@ -71,7 +71,7 @@ class PatrolDetailActivity : ComponentActivity() {
         val intent = Intent(this, EventDetailActivity::class.java)
         intent.putExtra(EventDetailActivity.removable, removable)
         intent.putExtra(EventDetailActivity.eventId, data.id)
-        startActivity(intent)
+        addEventLauncher.launch(intent)
     }
 
     private fun completedPatrolAction() {
