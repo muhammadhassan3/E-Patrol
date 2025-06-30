@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName
 import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 
 data class PatrolResponse(
@@ -13,7 +16,7 @@ data class PatrolResponse(
 data class PatrolItemResponse(
     val status: String?,
     @SerializedName("lokasi") val alamat: String,
-    @SerializedName("tgl_pelaksanaan") private val tglPelaksanaan: String,
+    @SerializedName("tgl_pelaksanaan") val tglPelaksanaan: String,
     @SerializedName("waktu_mulai") val jam: String,
     @SerializedName("ketua_regu") private val ketuaRaw: UserModel,
     private val verified: Int,
@@ -47,4 +50,21 @@ data class PatrolItemResponse(
                 "Gagal memuat tanggal"
             }
         }
+
+    fun getSelisihHari(): Int{
+        return try {
+            val responseFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = responseFormat.parse(tglPelaksanaan)
+            if (date != null) {
+                val today = Date()
+                val diffInMillis = today.time - date.time
+                (diffInMillis / (1000 * 60 * 60 * 24)).toInt()
+            } else {
+                -1 // Invalid date
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error calculating days difference")
+            -1 // Error case
+        }
+    }
 }

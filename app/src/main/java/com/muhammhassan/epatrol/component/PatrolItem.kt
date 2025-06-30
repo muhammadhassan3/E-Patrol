@@ -32,6 +32,7 @@ import com.muhammhassan.epatrol.ui.theme.Orange
 import com.muhammhassan.epatrol.ui.theme.Orange20
 import com.muhammhassan.epatrol.ui.theme.Red
 import com.muhammhassan.epatrol.ui.theme.Red20
+import com.muhammhassan.epatrol.utils.PatrolStatus
 import com.muhammhassan.epatrol.utils.PatrolStatus.BELUM_DIJALANKAN
 import com.muhammhassan.epatrol.utils.PatrolStatus.SEDANG_DIJALANKAN
 import com.muhammhassan.epatrol.utils.getDisplayStatus
@@ -78,6 +79,18 @@ fun PatrolItem(model: PatrolModel, onItemClick: (data: PatrolModel) -> Unit, mod
                             .background(Orange20)
                             .padding(12.dp, 2.dp),
                         color = Orange)
+                }
+                PatrolStatus.SEGERA_TAMBAH_LAPORAN -> {
+                    Text(getDisplayStatus(model.status),
+                        modifier = Modifier
+                            .constrainAs(status) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                            }
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Orange20)
+                            .padding(12.dp, 2.dp),
+                        color = Red)
                 }
                 else -> {
                     Text(

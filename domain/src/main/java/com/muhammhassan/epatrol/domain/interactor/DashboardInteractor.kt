@@ -24,7 +24,7 @@ class DashboardInteractor(private val user: UserRepository, private val task: Ta
                 list.map {
                     PatrolModel(
                         id = it.id,
-                        status = it.status ?: "Gagal mendapatkan status",
+                        status = if(it.getSelisihHari()>0) "segera-tambah-laporan" else it.status ?: "Gagal mendapatkan status",
                         title = it.judul,
                         date = it.tanggal,
                         hour = it.jam,

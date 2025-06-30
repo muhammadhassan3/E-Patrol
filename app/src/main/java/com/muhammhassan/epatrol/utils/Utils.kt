@@ -19,6 +19,7 @@ fun getDisplayStatus(statusCode: String): String = when (statusCode) {
     "belum-dikerjakan" -> "Belum dikerjakan"
     "sedang-dikerjakan" -> "Sedang berjalan"
     "sudah-dikerjakan" -> "Sudah dikerjakan"
+    "segera-tambah-laporan" -> "Segera tambah laporan"
     else -> "Status tidak tersedia"
 }
 fun Context.doReloginEvent(){
